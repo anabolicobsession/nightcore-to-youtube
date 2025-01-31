@@ -11,12 +11,12 @@ from googleapiclient.errors import ResumableUploadError
 from googleapiclient.http import MediaFileUpload
 
 
-def absolutize_path(local_path):
-    return os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), local_path)
+def absolutize_project_path(project_path):
+    return os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), project_path)
 
 
-CLIENT_SECRET_PATH = absolutize_path('client_secret_329273851917-v02c17fqgfp0kvidntpei8n2iuh8fp00.apps.googleusercontent.com.json')
-TOKEN_PATH = absolutize_path('token.pickle')
+CLIENT_SECRET_PATH = absolutize_project_path('credentials/client_secret_329273851917-v02c17fqgfp0kvidntpei8n2iuh8fp00.apps.googleusercontent.com.json')
+TOKEN_PATH = absolutize_project_path('credentials/token.pickle')
 QUATH_SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube']
 
 
