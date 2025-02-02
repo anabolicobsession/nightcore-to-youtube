@@ -12,8 +12,9 @@ DOWNLOADS_DIR = 'downloads'
 def main():
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
-            '/home/whiplash/.config/google-chrome',
+            '/home/whiplash/.config/microsoft-edge',
             args=['--profile-directory=Profile 34'],
+            channel='msedge',
             headless=False,
         )
 
@@ -27,7 +28,6 @@ def main():
             r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.relative > div.flex.gap-1.items-center.justify-center > button',
             timeout=3000
         )
-
         set_nightcore_parameters(page, speed=1.3, reverb=5)
 
         with downloader.download_as('output.mp3'):
