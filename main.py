@@ -77,7 +77,7 @@ class Main:
 
         if main.has_step(Step.CREATE_NIGHTCORE):
             if not main.speeds_and_reverbs:
-                raise click.MissingParameter('At least one speed parameter of the final track is required.')
+                raise click.MissingParameter("At least one speed parameter of the final track is required if 'create-nightcore' step is involved")
 
         main.run()
 
