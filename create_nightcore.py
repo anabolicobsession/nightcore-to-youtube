@@ -1,10 +1,11 @@
-import inspect
 import logging
 import os
 from contextlib import contextmanager
 from os.path import join
 
 from playwright.sync_api import Page, sync_playwright
+
+from paths import Path, absolutize_project_path
 
 
 DOWNLOADS_DIR = 'downloads'
@@ -13,7 +14,6 @@ DOWNLOADS_DIR = 'downloads'
 logger = logging.getLogger(__name__)
 
 
-Path = str
 Speed = int
 Reverb = int
 SpeedsAndReverbs = list[tuple[Speed, Reverb]]
@@ -62,10 +62,6 @@ def remove_previous_nightcore(dir_path: Path):
                 os.remove(path); removed.append(name)
 
     logger.info(f'Removed from {dir_path}: {", ".join(removed)}')
-
-
-def absolutize_project_path(project_path):
-    return join(os.path.dirname(inspect.getfile(inspect.currentframe())), project_path)
 
 
 class Downloader:
