@@ -1,6 +1,12 @@
+from enum import Enum
+
 import click
 
-from create_nightcore import Reverb, Speed
+from create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
+
+
+class Step(Enum):
+    CREATE_NIGHTCORE = 1
 
 
 class Main:
@@ -59,17 +65,26 @@ class Main:
         if not (start_step <= end_step):
             raise click.BadParameter(f'The starting step ({start_step}) must be greater than or equal to the ending step ({end_step}).')
 
-        Main(
+        main = Main(
             track_dir=track_dir,
             speeds_and_reverbs=Main.extract_speed_and_reverb_tuples(speeds_and_reverbs),
             steps={step} if step else set(range(start_step, end_step + 1)),
-        ).run()
+        )
+
+        if main.has_step(Step.CREATE_NIGHTCORE):
+            if not main.speeds_and_reverbs:
+                raise click.MissingParameter('At least one speed parameter of the final track is required.')
+
+        main.run()
 
     def run(self):
-        ...
+        if self.has_step(Step.CREATE_NIGHTCORE): create_nightcore(self.track_dir, self.speeds_and_reverbs)
+
+    def has_step(self, checked_step: Step):
+        return checked_step.value in self.steps
 
     @staticmethod
-    def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> list[tuple[Speed, Reverb]]:
+    def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> SpeedsAndReverbs:
         speeds = []
         reverbs = []
         i = 0

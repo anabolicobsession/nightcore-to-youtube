@@ -9,15 +9,21 @@ from playwright.sync_api import Page, sync_playwright
 DOWNLOADS_DIR = 'downloads'
 
 
+Path = str
+Speed = int
+Reverb = int
+SpeedsAndReverbs = list[tuple[Speed, Reverb]]
+
+
 class Selector:
     PAUSE = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.relative > div.flex.gap-1.items-center.justify-center > button'
     DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
 
 
-def main():
+def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs):
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
-            '/home/whiplash/.config/microsoft-edge',
+            user_data_dir='/home/whiplash/.config/microsoft-edge',
             args=['--profile-directory=Profile 34'],
             channel='msedge',
             headless=False,
@@ -86,7 +92,3 @@ def set_slider_value(page: Page, selector, target_value, step):
     key = 'ArrowRight' if target_value > initial_value else 'ArrowLeft'
     slider.click()
     for _ in range(steps): page.keyboard.press(key)
-
-
-if __name__ == '__main__':
-    main()
