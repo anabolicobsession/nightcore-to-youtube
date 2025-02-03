@@ -1,4 +1,5 @@
 import inspect
+import logging
 import os
 from contextlib import contextmanager
 from os.path import join
@@ -7,6 +8,9 @@ from playwright.sync_api import Page, sync_playwright
 
 
 DOWNLOADS_DIR = 'downloads'
+
+
+logger = logging.getLogger(__name__)
 
 
 Path = str
@@ -21,6 +25,8 @@ class Selector:
 
 
 def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs):
+    remove_previous_nightcore(track_dir)
+
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
             user_data_dir='/home/whiplash/.config/microsoft-edge',
@@ -41,6 +47,21 @@ def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs):
 
         page.pause()
         context.close()
+
+
+def remove_previous_nightcore(dir_path: Path):
+    removed = []
+
+    for name in os.listdir(dir_path):
+        path = os.path.join(dir_path, name)
+
+        if os.path.isfile(path):
+            base_name, extension = os.path.splitext(name)
+
+            if base_name.isdigit() and extension.lower() == '.mp3':
+                os.remove(path); removed.append(name)
+
+    logger.info(f'Removed from {dir_path}: {", ".join(removed)}')
 
 
 def absolutize_project_path(project_path):
