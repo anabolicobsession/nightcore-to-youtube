@@ -1,8 +1,12 @@
+import logging
 from enum import Enum
 
 import click
 
 from create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
+
+
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 class Step(Enum):
