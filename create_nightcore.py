@@ -9,6 +9,11 @@ from playwright.sync_api import Page, sync_playwright
 DOWNLOADS_DIR = 'downloads'
 
 
+class Selector:
+    PAUSE = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.relative > div.flex.gap-1.items-center.justify-center > button'
+    DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
+
+
 def main():
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
@@ -24,17 +29,9 @@ def main():
 
         page.goto('https://nightcore.studio/')
         page.set_input_files('input[type="file"]', absolutize_project_path('input.mp3'))
-        page.wait_for_selector(
-            r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.relative > div.flex.gap-1.items-center.justify-center > button',
-            timeout=3000
-        )
+        page.wait_for_selector(Selector.PAUSE, timeout=2000).click()
         set_nightcore_parameters(page, speed=1.3, reverb=5)
-
-        with downloader.download_as('output.mp3'):
-            page.wait_for_selector(
-                r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)',
-                timeout=1000,
-            ).click()
+        with downloader.download_as('output.mp3'): page.wait_for_selector(Selector.DOWNLOAD, timeout=1000).click()
 
         page.pause()
         context.close()
