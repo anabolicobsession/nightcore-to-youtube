@@ -5,10 +5,8 @@ from os.path import join
 
 from playwright.sync_api import Page, sync_playwright
 
+import config
 from paths import Path, absolutize_project_path
-
-
-DOWNLOADS_DIR = 'downloads'
 
 
 logger = logging.getLogger(__name__)
@@ -65,7 +63,7 @@ def remove_previous_nightcore(dir_path: Path):
 
 
 class Downloader:
-    DOWNLOADS_PATH = absolutize_project_path(DOWNLOADS_DIR)
+    DOWNLOADS_PATH = absolutize_project_path(config.DOWNLOADS_DIR)
 
     def __init__(self, page: Page):
         self.page = page
