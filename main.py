@@ -82,7 +82,7 @@ class Main:
         main.run()
 
     def run(self):
-        if self.has_step(Step.CREATE_NIGHTCORE): create_nightcore(self.track_dir, self.speeds_and_reverbs)
+        if self.has_step(Step.CREATE_NIGHTCORE): create_nightcore(self.track_dir, self.speeds_and_reverbs, debug=False)
 
     def has_step(self, checked_step: Step):
         return checked_step.value in self.steps
