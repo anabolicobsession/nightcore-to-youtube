@@ -25,7 +25,7 @@ class Selector:
 
 
 def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs):
-    remove_previous_nightcore(track_dir)
+    remove_previous_nightcore(Downloader.DOWNLOADS_PATH)
 
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
@@ -43,7 +43,7 @@ def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs):
         page.set_input_files('input[type="file"]', absolutize_project_path('input.mp3'))
         page.wait_for_selector(Selector.PAUSE, timeout=2000).click()
         set_nightcore_parameters(page, speed=1.3, reverb=5)
-        with downloader.download_as('output.mp3'): page.wait_for_selector(Selector.DOWNLOAD, timeout=1000).click()
+        with downloader.download_as('70.mp3'): page.wait_for_selector(Selector.DOWNLOAD, timeout=1000).click()
 
         page.pause()
         context.close()
@@ -61,7 +61,7 @@ def remove_previous_nightcore(dir_path: Path):
             if base_name.isdigit() and extension.lower() == '.mp3':
                 os.remove(path); removed.append(name)
 
-    logger.info(f'Removed from {dir_path}: {", ".join(removed)}')
+    if removed: logger.info(f'Removed from {dir_path}: {", ".join(removed)}')
 
 
 class Downloader:
@@ -77,7 +77,7 @@ class Downloader:
         self.file_name = None
 
     @contextmanager
-    def download_as(self, file_name, wait_for_download_to_start=3000, wait_for_download_to_complete=0):
+    def download_as(self, file_name, wait_for_download_to_start=15000, wait_for_download_to_complete=0):
         self.file_name = file_name
         yield
         self.page.wait_for_event('download', timeout=wait_for_download_to_start)
