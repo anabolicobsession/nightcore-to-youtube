@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from pathlib import Path
 
 import click
 
@@ -17,9 +18,9 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
 [<speed> [reverb]]...: Speed and reverb parameters of the final tracks.
 """)
 @click.argument(
-    'track_dir',
-    type=click.Path(exists=True, file_okay=False, readable=True),
-    metavar='[track-directory]',
+    'working_directory',
+    type=click.Path(path_type=Path, exists=True, file_okay=False, readable=True, writable=True),
+    metavar='[working-directory]',
 )
 @click.argument(
     'speeds_and_reverbs',
@@ -54,7 +55,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     help='Single pipeline step.',
     metavar='',
 )
-def cli(track_dir, speeds_and_reverbs, start_step, end_step, step):
+def cli(working_directory: Path, speeds_and_reverbs: tuple[int], start_step: int, end_step: int, step: int):
 
     # parameter validation
     if not (start_step <= end_step):
@@ -72,7 +73,7 @@ def cli(track_dir, speeds_and_reverbs, start_step, end_step, step):
 
     # pipeline
     if has_step(Step.CREATE_NIGHTCORE):
-        create_nightcore(track_dir, speed_and_reverbs, debug=config.DEBUG_MODE)
+        create_nightcore(working_directory, speed_and_reverbs, debug=config.DEBUG_MODE)
 
 
 class Step(Enum):
