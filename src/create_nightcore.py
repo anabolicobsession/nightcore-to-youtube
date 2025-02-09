@@ -5,8 +5,8 @@ from os.path import join
 
 from playwright.sync_api import Page, sync_playwright
 
-import config
-from paths import Path, absolutize_project_path
+from src import config
+from src.paths import Path, absolutize_project_path
 
 
 logger = logging.getLogger(__name__)

@@ -1,2 +1,2 @@
-DEBUG_MODE = False
+DEBUG_MODE = True
 DOWNLOADS_DIR = 'downloads'

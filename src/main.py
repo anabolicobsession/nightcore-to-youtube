@@ -3,8 +3,8 @@ from enum import Enum
 
 import click
 
-import config
-from create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
+from src import config
+from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -29,7 +29,6 @@ class Main:
     """)
     @click.argument(
         'track_dir',
-        required=False,
         type=click.Path(exists=True, file_okay=False, readable=True),
         metavar='[track-directory]',
     )

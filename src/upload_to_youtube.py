@@ -15,8 +15,8 @@ def absolutize_project_path(project_path):
     return os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), project_path)
 
 
-CLIENT_SECRET_PATH = absolutize_project_path('credentials/client_secret_329273851917-v02c17fqgfp0kvidntpei8n2iuh8fp00.apps.googleusercontent.com.json')
-TOKEN_PATH = absolutize_project_path('credentials/token.pickle')
+CLIENT_SECRET_PATH = absolutize_project_path('../credentials/client_secret_329273851917-v02c17fqgfp0kvidntpei8n2iuh8fp00.apps.googleusercontent.com.json')
+TOKEN_PATH = absolutize_project_path('../credentials/token.pickle')
 QUATH_SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube']
 
 
@@ -29,7 +29,7 @@ def main(track_name):
     service = build('youtube', 'v3', credentials=get_youtube_credentials())
 
     speeds = []
-    for file_name in os.listdir('.'):
+    for file_name in os.listdir('..'):
         if file_name.endswith('.mp4'):
             base_name = os.path.splitext(file_name)[0]
             speeds.append((file_name, int(base_name if '_' not in base_name else base_name.split('_')[0]) / 100))

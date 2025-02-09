@@ -10,7 +10,7 @@ fi
 dir="$1"
 preset="$2"
 image=$(find "$dir" -maxdepth 1 -name "*.png" -print -quit)
-script="$HOME/code/music_to_youtube/mp3_to_mp4.sh"
+script="$HOME/code/nightcore_to_youtube/mp3_to_mp4.sh"
 
 
 find "$dir" -maxdepth 1 -type f -regex '.*[0-9_]\.mp3$' -print0 | xargs -0 -P 4 -I {} bash -c ''$script' "{}" '$image' '$preset''
