@@ -1,5 +1,4 @@
 #!/bin/bash
 
-# copy Chrome profile to Edge
-cp -r "$HOME/.config/google-chrome/Profile 34" "$HOME/.config/microsoft-edge/"
-echo "Chrome profile successfully updated"
+profile="Profile 34"
+cd "$HOME/.config" && cp -r "google-chrome/$profile" "microsoft-edge/" && echo "Chrome profile successfully updated"
