@@ -1,12 +1,8 @@
 import logging
-import os
 from contextlib import contextmanager
-from os.path import join
+from pathlib import Path
 
 from playwright.sync_api import Page, sync_playwright
-
-from src import config
-from src.paths import Path, absolutize_project_path
 
 
 logger = logging.getLogger(__name__)
@@ -22,8 +18,8 @@ class Selector:
     DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
 
 
-def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs, debug=False):
-    remove_previous_nightcore(Downloader.DOWNLOADS_PATH)
+def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAndReverbs, debug=False):
+    remove_previous_nightcore(working_directory)
 
     with sync_playwright() as p:
         context = p.chromium.launch_persistent_context(
@@ -35,10 +31,10 @@ def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs, debu
 
         setup_page_methods()
         page = context.pages[0]
-        downloader = Downloader(page)
+        downloader = Downloader(page, directory=working_directory)
 
         page.goto('https://nightcore.studio/')
-        page.set_input_files('input[type="file"]', absolutize_project_path('input.mp3'))
+        page.set_input_files('input[type="file"]', working_directory / Path('input.mp3'))
         page.wait_for_selector(Selector.PAUSE, timeout=2000).click()
         set_nightcore_parameters(page, speed=1.3, reverb=5)
         with downloader.download_as('70.mp3'): page.wait_for_selector(Selector.DOWNLOAD, timeout=1000).click()
@@ -47,31 +43,25 @@ def create_nightcore(track_dir: Path, speeds_and_reverbs: SpeedsAndReverbs, debu
         context.close()
 
 
-def remove_previous_nightcore(dir_path: Path):
+def remove_previous_nightcore(directory: Path):
     removed = []
 
-    for name in os.listdir(dir_path):
-        path = os.path.join(dir_path, name)
+    for path in directory.iterdir():
+        if path.is_file() and path.suffix.lower().lstrip('.') == 'mp3' and path.stem.isdigit():
+            path.unlink(); removed.append(path.name)
 
-        if os.path.isfile(path):
-            base_name, extension = os.path.splitext(name)
-
-            if base_name.isdigit() and extension.lower() == '.mp3':
-                os.remove(path); removed.append(name)
-
-    if removed: logger.info(f'Removed from {dir_path}: {", ".join(removed)}')
+    if removed: logger.info(f'Removed from {directory}: {", ".join(removed)}')
 
 
 class Downloader:
-    DOWNLOADS_PATH = absolutize_project_path(config.DOWNLOADS_DIR)
-
-    def __init__(self, page: Page):
+    def __init__(self, page: Page, directory: Path):
         self.page = page
-        self.page.on('download', self.handle_download)
+        self.directory = directory
         self.file_name = None
+        self.page.on('download', self.handle_download)
 
     def handle_download(self, download):
-        download.save_as(join(self.DOWNLOADS_PATH, download.suggested_filename if not self.file_name else self.file_name))
+        download.save_as(self.directory / (self.file_name if self.file_name else download.suggested_filename))
         self.file_name = None
 
     @contextmanager
