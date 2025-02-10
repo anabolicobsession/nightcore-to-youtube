@@ -9,6 +9,7 @@ from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightco
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 
 @click.command(help="""
@@ -73,6 +74,7 @@ def cli(working_directory: Path, speeds_and_reverbs: tuple[int], start_step: int
 
     # pipeline
     if has_step(Step.CREATE_NIGHTCORE):
+        logger.info(f'{Step.CREATE_NIGHTCORE.value}. Starting nightcore creation')
         create_nightcore(working_directory, speed_and_reverbs, debug=config.DEBUG_MODE)
 
 

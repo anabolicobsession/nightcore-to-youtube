@@ -34,9 +34,15 @@ def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAndRever
         downloader = Downloader(page, directory=working_directory)
 
         page.goto('https://nightcore.studio/')
+
+        logger.info('Uploading source track')
         page.set_input_files('input[type="file"]', working_directory / Path('input.mp3'))
         page.wait_for_selector(Selector.PAUSE, timeout=2000).click()
+
+        logger.info('Setting up nightcore parameters')
         set_nightcore_parameters(page, speed=1.3, reverb=5)
+
+        logger.info('Downloading nightcore')
         with downloader.download_as('70.mp3'): page.wait_for_selector(Selector.DOWNLOAD, timeout=1000).click()
 
         page.pause()
