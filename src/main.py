@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from enum import Enum
 from pathlib import Path
@@ -56,7 +57,11 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     help='Single pipeline step.',
     metavar='',
 )
-def cli(working_directory: Path, speeds_and_reverbs: tuple[int], start_step: int, end_step: int, step: int):
+def cli(**kwargs):
+    asyncio.run(async_cli(**kwargs))
+
+
+async def async_cli(working_directory: Path, speeds_and_reverbs: tuple[int], start_step: int, end_step: int, step: int):
 
     # parameter validation
     if not (start_step <= end_step):
@@ -72,10 +77,10 @@ def cli(working_directory: Path, speeds_and_reverbs: tuple[int], start_step: int
             raise click.MissingParameter("At least one speed parameter of the final track is required if 'create-nightcore' step is involved")
 
 
-    # pipeline
+    # pipeline steps
     if has_step(Step.CREATE_NIGHTCORE):
         logger.info(f'{Step.CREATE_NIGHTCORE.value}. Starting nightcore creation')
-        create_nightcore(working_directory, speed_and_reverbs, debug=config.DEBUG_MODE)
+        await create_nightcore(working_directory, speed_and_reverbs, debug=config.DEBUG_MODE)
 
 
 class Step(Enum):
