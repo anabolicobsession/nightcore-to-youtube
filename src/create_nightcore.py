@@ -6,6 +6,10 @@ from pathlib import Path
 from playwright.async_api import BrowserContext, Page, async_playwright
 
 
+DEFAULT_SPEED = 100
+DEFAULT_REVERB = 0
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,11 +34,11 @@ async def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAn
             channel='msedge',
             headless=not debug,
         )
-        await _create_nightcore(context, working_directory, speed=1.3, reverb=5)
+        await _create_nightcore(context, working_directory, speed=120, reverb=5)
         await context.close()
 
 
-async def _create_nightcore(context: BrowserContext, working_directory: Path, speed=1, reverb=0):
+async def _create_nightcore(context: BrowserContext, working_directory: Path, speed=DEFAULT_SPEED, reverb=DEFAULT_REVERB):
     page = await context.new_page()
     downloader = Downloader(page, directory=working_directory)
 
@@ -84,9 +88,9 @@ class Downloader:
         await self.page.wait_for_timeout(wait_for_download_to_complete)
 
 
-async def set_nightcore_parameters(page, speed=1, reverb=0):
+async def set_nightcore_parameters(page, speed=DEFAULT_SPEED, reverb=DEFAULT_REVERB):
     await page.move_slider('div[role="slider"][aria-valuemin="-60"][aria-valuemax="0"]', 300)
-    await page.set_slider_value('div[role="slider"][aria-valuemin="0.5"][aria-valuemax="2"]', speed, step=0.01)
+    await page.set_slider_value('div[role="slider"][aria-valuemin="0.5"][aria-valuemax="2"]', speed / 100, step=0.01)
     await page.set_slider_value('div[role="slider"][aria-valuemin="0.01"][aria-valuemax="10"]', reverb + 0.01, step=0.05)
 
 
