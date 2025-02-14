@@ -75,17 +75,19 @@ class Downloader:
         self.directory = directory
         self.file_name = None
         self.page.on('download', lambda download: asyncio.create_task(self.handle_download(download)))
-
-    async def handle_download(self, download):
-        await download.save_as(self.directory / (self.file_name if self.file_name else download.suggested_filename))
-        self.file_name = None
+        self.download = None
 
     @asynccontextmanager
-    async def download_as(self, file_name, wait_for_download_to_start=15000, wait_for_download_to_complete=0):
+    async def download_as(self, file_name, wait_for_download_to_start=15000):
         self.file_name = file_name
         yield
         await self.page.wait_for_event('download', timeout=wait_for_download_to_start)
-        await self.page.wait_for_timeout(wait_for_download_to_complete)
+        await self.download.path()  # wait for download to complete
+        self.file_name = None
+
+    async def handle_download(self, download):
+        self.download = download
+        await download.save_as(self.directory / (self.file_name if self.file_name else download.suggested_filename))
 
 
 async def set_nightcore_parameters(page, speed=DEFAULT_SPEED, reverb=DEFAULT_REVERB):
