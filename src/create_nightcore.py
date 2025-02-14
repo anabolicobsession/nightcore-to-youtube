@@ -3,7 +3,7 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from playwright.async_api import Page, async_playwright
+from playwright.async_api import BrowserContext, Page, async_playwright
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,7 @@ class Selector:
 
 
 async def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAndReverbs, debug=False):
+    setup_page_methods()
     remove_previous_nightcore(working_directory)
 
     async with async_playwright() as p:
@@ -29,25 +30,29 @@ async def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAn
             channel='msedge',
             headless=not debug,
         )
-
-        setup_page_methods()
-        page = context.pages[0]
-        downloader = Downloader(page, directory=working_directory)
-
-        await page.goto('https://nightcore.studio/')
-
-        logger.info('Uploading source track')
-        await page.set_input_files('input[type="file"]', working_directory / Path('input.mp3'))
-        await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
-
-        logger.info('Setting up nightcore parameters')
-        await set_nightcore_parameters(page, speed=1.3, reverb=5)
-
-        logger.info('Downloading nightcore')
-        async with downloader.download_as('70.mp3'): await (await page.wait_for_selector(Selector.DOWNLOAD, timeout=1000)).click()
-
-        await page.pause()
+        await _create_nightcore(context, working_directory, speed=1.3, reverb=5)
         await context.close()
+
+
+async def _create_nightcore(context: BrowserContext, working_directory: Path, speed=1, reverb=0):
+    page = await context.new_page()
+    downloader = Downloader(page, directory=working_directory)
+
+    await page.goto('https://nightcore.studio/')
+
+    logger.info('Uploading source track')
+    await page.set_input_files('input[type="file"]', working_directory / Path('input.mp3'))
+    await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
+
+    logger.info('Setting up nightcore parameters')
+    await set_nightcore_parameters(page, speed=speed, reverb=reverb)
+
+    logger.info('Downloading nightcore')
+    file_name = f'{speed}.mp3'
+    async with downloader.download_as(file_name): await (await page.wait_for_selector(Selector.DOWNLOAD, timeout=1000)).click()
+
+    logger.info(f'Nightcore saved as: {file_name}')
+    await page.close()
 
 
 def remove_previous_nightcore(directory: Path):
