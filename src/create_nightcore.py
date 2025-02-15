@@ -5,6 +5,8 @@ from pathlib import Path
 
 from playwright.async_api import BrowserContext, Page, async_playwright
 
+from src.working_directory import WorkingDirectory
+
 
 DEFAULT_SPEED = 100
 DEFAULT_REVERB = 0
@@ -23,9 +25,9 @@ class Selector:
     DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
 
 
-async def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAndReverbs, debug=False):
+async def create_nightcore(working_directory: WorkingDirectory, speeds_and_reverbs: SpeedsAndReverbs, debug=False):
     setup_page_methods()
-    remove_previous_nightcore(working_directory)
+    remove_previous_nightcore(working_directory.path)
 
     async with async_playwright() as p:
         context = await p.chromium.launch_persistent_context(
@@ -38,14 +40,14 @@ async def create_nightcore(working_directory: Path, speeds_and_reverbs: SpeedsAn
         await context.close()
 
 
-async def _create_nightcore(context: BrowserContext, working_directory: Path, speed=DEFAULT_SPEED, reverb=DEFAULT_REVERB):
+async def _create_nightcore(context: BrowserContext, working_directory: WorkingDirectory, speed=DEFAULT_SPEED, reverb=DEFAULT_REVERB):
     page = await context.new_page()
-    downloader = Downloader(page, directory=working_directory)
+    downloader = Downloader(page, directory=working_directory.path)
 
     await page.goto('https://nightcore.studio/')
 
     logger.info('Uploading source track')
-    await page.set_input_files('input[type="file"]', working_directory / Path('input.mp3'))
+    await page.set_input_files('input[type="file"]', working_directory.track_path)
     await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
 
     logger.info('Setting up nightcore parameters')

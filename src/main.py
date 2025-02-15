@@ -7,6 +7,7 @@ import click
 
 from src import config
 from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
+from src.working_directory import WorkingDirectory
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -75,6 +76,10 @@ async def async_cli(working_directory: Path, speeds_and_reverbs: tuple[int], sta
     if has_step(Step.CREATE_NIGHTCORE):
         if not speed_and_reverbs:
             raise click.MissingParameter("At least one speed parameter of the final track is required if 'create-nightcore' step is involved")
+
+
+    # convertion
+    working_directory = WorkingDirectory(working_directory)
 
 
     # pipeline steps
