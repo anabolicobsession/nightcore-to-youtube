@@ -36,7 +36,7 @@ async def create_nightcore(working_directory: WorkingDirectory, speeds_and_rever
             channel='msedge',
             headless=not gui,
         )
-        await _create_nightcore(context, working_directory, speed=120, reverb=5)
+        await asyncio.gather(*[_create_nightcore(context, working_directory, *x) for x in speeds_and_reverbs])
         await context.close()
 
 
