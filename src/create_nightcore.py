@@ -44,19 +44,22 @@ async def _create_nightcore(context: BrowserContext, working_directory: WorkingD
     page = await context.new_page()
     downloader = Downloader(page, directory=working_directory.path)
 
+    def wrap_log(log: str):
+        return f'{speed:>3}x{reverb:<2}: {log}'
+
     await page.goto('https://nightcore.studio/')
 
-    logger.info('Uploading source track')
+    logger.info(wrap_log('Uploading source track'))
     await page.set_input_files('input[type="file"]', working_directory.track_path)
     await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
 
-    logger.info('Setting up nightcore parameters')
+    logger.info(wrap_log('Setting up nightcore parameters'))
     await set_nightcore_parameters(page, speed=speed, reverb=reverb)
 
-    logger.info('Downloading nightcore')
+    logger.info(wrap_log('Downloading nightcore'))
     file_name = f'{speed}_{reverb}.mp3'
     async with downloader.download_as(file_name): await (await page.wait_for_selector(Selector.DOWNLOAD, timeout=1000)).click()
-    logger.info(f'Nightcore saved as: {file_name}')
+    logger.info(wrap_log(f'Nightcore saved as: {file_name}'))
 
     await page.close()
 
