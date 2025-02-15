@@ -54,10 +54,10 @@ async def _create_nightcore(context: BrowserContext, working_directory: WorkingD
     await set_nightcore_parameters(page, speed=speed, reverb=reverb)
 
     logger.info('Downloading nightcore')
-    file_name = f'{speed}.mp3'
+    file_name = f'{speed}_{reverb}.mp3'
     async with downloader.download_as(file_name): await (await page.wait_for_selector(Selector.DOWNLOAD, timeout=1000)).click()
-
     logger.info(f'Nightcore saved as: {file_name}')
+
     await page.close()
 
 
