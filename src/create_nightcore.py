@@ -25,7 +25,7 @@ class Selector:
     DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
 
 
-async def create_nightcore(working_directory: WorkingDirectory, speeds_and_reverbs: SpeedsAndReverbs, debug=False):
+async def create_nightcore(working_directory: WorkingDirectory, speeds_and_reverbs: SpeedsAndReverbs, gui=False):
     setup_page_methods()
     remove_previous_nightcore(working_directory.path)
 
@@ -34,7 +34,7 @@ async def create_nightcore(working_directory: WorkingDirectory, speeds_and_rever
             user_data_dir='/home/whiplash/.config/microsoft-edge',
             args=['--profile-directory=Profile 34'],
             channel='msedge',
-            headless=not debug,
+            headless=not gui,
         )
         await _create_nightcore(context, working_directory, speed=120, reverb=5)
         await context.close()

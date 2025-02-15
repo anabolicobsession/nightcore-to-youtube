@@ -5,7 +5,6 @@ from pathlib import Path
 
 import click
 
-from src import config
 from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
 from src.working_directory import WorkingDirectory
 
@@ -58,11 +57,24 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     help='Single pipeline step.',
     metavar='',
 )
+@click.option(
+    '--gui',
+    '-g',
+    is_flag=True,
+    help='Run with a graphical interface instead of console mode.',
+)
 def cli(**kwargs):
     asyncio.run(async_cli(**kwargs))
 
 
-async def async_cli(working_directory: Path, speeds_and_reverbs: tuple[int], start_step: int, end_step: int, step: int):
+async def async_cli(
+        working_directory: Path,
+        speeds_and_reverbs: tuple[int],
+        start_step: int,
+        end_step: int,
+        step: int,
+        gui: bool,
+):
 
     # parameter validation
     if not (start_step <= end_step):
@@ -85,7 +97,7 @@ async def async_cli(working_directory: Path, speeds_and_reverbs: tuple[int], sta
     # pipeline steps
     if has_step(Step.CREATE_NIGHTCORE):
         logger.info(f'{Step.CREATE_NIGHTCORE.value}. Starting nightcore creation')
-        await create_nightcore(working_directory, speed_and_reverbs, debug=config.DEBUG_MODE)
+        await create_nightcore(working_directory, speed_and_reverbs, gui=gui)
 
 
 class Step(Enum):
