@@ -27,7 +27,7 @@ class Selector:
 
 async def create_nightcore(working_directory: WorkingDirectory, speeds_and_reverbs: SpeedsAndReverbs, gui=False):
     setup_page_methods()
-    remove_previous_nightcore(working_directory.path)
+    remove_previous_nightcore(working_directory)
 
     async with async_playwright() as p:
         context = await p.chromium.launch_persistent_context(
@@ -64,13 +64,10 @@ async def _create_nightcore(context: BrowserContext, working_directory: WorkingD
     await page.close()
 
 
-def remove_previous_nightcore(directory: Path):
-    removed = []
-
-    for path in directory.iterdir():
-        if WorkingDirectory.is_nightcore_file(path): path.unlink(); removed.append(path.name)
-
-    if removed: logger.info(f'Removed from {directory}: {", ".join(removed)}')
+def remove_previous_nightcore(working_directory: WorkingDirectory):
+    paths = working_directory.nightcore_paths
+    for x in paths: x.unlink()
+    if paths: logger.info(f'Removed from {working_directory.path}: {", ".join([x.name for x in paths])}')
 
 
 class Downloader:
