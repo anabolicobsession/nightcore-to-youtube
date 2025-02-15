@@ -113,7 +113,7 @@ async def move_slider(page: Page, selector, steps):
 async def set_slider_value(page: Page, selector, target_value, step):
     slider = await page.wait_for_selector(selector, timeout=3000)
     initial_value = float(await slider.get_attribute('aria-valuenow'))
-    steps = int(abs(target_value - initial_value) / step)
+    steps = round(abs(target_value - initial_value) / step)
     key = 'ArrowRight' if target_value > initial_value else 'ArrowLeft'
     await slider.click()
     for _ in range(steps): await page.keyboard.press(key)
