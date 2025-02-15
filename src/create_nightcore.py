@@ -68,8 +68,7 @@ def remove_previous_nightcore(directory: Path):
     removed = []
 
     for path in directory.iterdir():
-        if path.is_file() and path.suffix.lower().lstrip('.') == 'mp3' and path.stem.isdigit():
-            path.unlink(); removed.append(path.name)
+        if WorkingDirectory.is_nightcore_file(path): path.unlink(); removed.append(path.name)
 
     if removed: logger.info(f'Removed from {directory}: {", ".join(removed)}')
 

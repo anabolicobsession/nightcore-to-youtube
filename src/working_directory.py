@@ -8,7 +8,7 @@ class WorkingDirectory:
     @property
     def track_path(self) -> Path:
         if track_path := next(
-                (file for file in self.path.glob('*.mp3') if not all(c.isdigit() or c == '_' for c in file.stem)),
+                (file for file in self.path.glob('*.mp3') if not self.is_nightcore_file(file)),
                 None
         ):
             return track_path
@@ -18,3 +18,11 @@ class WorkingDirectory:
     @property
     def track_name(self) -> str:
         return self.track_path.stem
+
+    @staticmethod
+    def is_nightcore_file(path: Path):
+        return (
+                path.is_file() and
+                path.suffix.lower() == ".mp3" and
+                all(c.isdigit() or c == '_' for c in path.stem)
+        )
