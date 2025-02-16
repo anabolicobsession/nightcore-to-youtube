@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 
 def has_extension(path: Path, extension: str):
@@ -8,16 +9,14 @@ def has_extension(path: Path, extension: str):
 class WorkingDirectory:
     def __init__(self, path: str | Path):
         self.path = Path(path)
+        
+    def get_path(self) -> Path:
+        return self.path
 
-    @property
-    def track_path(self) -> Path:
-        if path := next((x for x in self.path.iterdir() if self._is_track_path(x)), None):
-            return path
-        else:
-            raise FileNotFoundError(f'Couldn\'t find track file in directory: {self.path}')
+    def get_track_path(self) -> Optional[Path]:
+        return next((x for x in self.path.iterdir() if self._is_track_path(x)), None)
 
-    @property
-    def nightcore_paths(self) -> list[Path]:
+    def get_nightcore_paths(self) -> list[Path]:
         return [x for x in self.path.iterdir() if self._is_nightcore_path(x)]
 
     @staticmethod

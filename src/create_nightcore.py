@@ -51,7 +51,7 @@ async def _create_nightcore(
         reverb: Reverb = DEFAULT_REVERB,
 ):
     page = await context.new_page()
-    downloader = Downloader(page, directory=working_directory.path)
+    downloader = Downloader(page, directory=working_directory.get_path())
 
     def wrap_log(log: str):
         return f'{speed:>3}x{reverb:<2}: {log}'
@@ -59,7 +59,7 @@ async def _create_nightcore(
     await page.goto('https://nightcore.studio/')
 
     logger.info(wrap_log('Uploading source track'))
-    await page.set_input_files('input[type="file"]', working_directory.track_path)
+    await page.set_input_files('input[type="file"]', working_directory.get_track_path())
     await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
 
     logger.info(wrap_log('Setting up nightcore parameters'))
@@ -74,9 +74,9 @@ async def _create_nightcore(
 
 
 def remove_previous_nightcore(working_directory: WorkingDirectory):
-    paths = working_directory.nightcore_paths
-    for x in paths: x.unlink()
-    if paths: logger.info(f'Removed from {working_directory.path}: {", ".join([x.name for x in paths])}')
+    if paths := working_directory.get_nightcore_paths():
+        for x in paths: x.unlink()
+        logger.info(f'Removed from {working_directory.get_path()}: {", ".join([x.name for x in paths])}')
 
 
 class Downloader:
