@@ -4,6 +4,11 @@ from typing import Optional
 
 Extension = str
 
+
+class TooManyFilesError(Exception):
+    ...
+
+
 def has_any_of_extensions(path: Path, *extensions: Extension):
     return any(path.suffix.lower() == '.' + x for x in extensions)
 
@@ -19,12 +24,14 @@ class WorkingDirectory:
         return self.path
 
     def get_track_path(self, raise_if_not_exists=False) -> Optional[Path]:
-        path = next((x for x in self.path.iterdir() if self._is_track_path(x)), None),
+        paths = [x for x in self.path.iterdir() if self._is_track_path(x)]
 
-        if raise_if_not_exists and not path:
+        if raise_if_not_exists and not paths:
             raise FileNotFoundError(f'Couldn\'t find track file in directory: {self.path}')
+        elif len(paths) > 1:
+            raise TooManyFilesError(f'There are multiple track files in directory: {self.path}')
 
-        return path
+        return paths[0] if paths else None
 
     def get_nightcore_paths(self, raise_if_not_exist=False) -> list[Path]:
         paths = [x for x in self.path.iterdir() if self._is_nightcore_path(x)]
