@@ -2,8 +2,10 @@ from pathlib import Path
 from typing import Optional
 
 
-def has_extension(path: Path, extension: str):
-    return path.suffix.lower() == '.' + extension
+Extension = str
+
+def has_any_of_extensions(path: Path, *extensions: Extension):
+    return any(path.suffix.lower() == '.' + x for x in extensions)
 
 
 class WorkingDirectory:
@@ -36,7 +38,7 @@ class WorkingDirectory:
     def _is_track_path(path: Path):
         return (
                 path.is_file() and
-                has_extension(path, 'mp3') and
+                has_any_of_extensions(path, 'mp3') and
                 not WorkingDirectory._has_nightcore_name(path)
         )
 
@@ -44,7 +46,7 @@ class WorkingDirectory:
     def _is_nightcore_path(path: Path):
         return (
                 path.is_file() and
-                has_extension(path, 'mp3') and
+                has_any_of_extensions(path, 'mp3') and
                 WorkingDirectory._has_nightcore_name(path)
         )
 
