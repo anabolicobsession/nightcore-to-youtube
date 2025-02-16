@@ -28,7 +28,7 @@ class Selector:
 async def create_nightcore(
         working_directory: WorkingDirectory,
         speeds_and_reverbs: SpeedsAndReverbs,
-        gui=False,
+        gui: bool = False,
 ):
     setup_page_methods()
     remove_previous_nightcore(working_directory)
@@ -47,8 +47,8 @@ async def create_nightcore(
 async def _create_nightcore(
         context: BrowserContext,
         working_directory: WorkingDirectory,
-        speed=DEFAULT_SPEED,
-        reverb=DEFAULT_REVERB,
+        speed: Speed = DEFAULT_SPEED,
+        reverb: Reverb = DEFAULT_REVERB,
 ):
     page = await context.new_page()
     downloader = Downloader(page, directory=working_directory.path)
