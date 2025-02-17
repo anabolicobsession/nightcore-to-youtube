@@ -33,8 +33,8 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     metavar='[<speed> [reverb]]...',
 )
 @click.option(
-    '-s',
     '--start-step',
+    '-s',
     type=click.IntRange(1, 3),
     default=1,
     show_default=True,
@@ -42,8 +42,8 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     metavar='',
 )
 @click.option(
-    '-e',
     '--end-step',
+    '-e',
     type=click.IntRange(1, 3),
     default=3,
     show_default=True,
@@ -51,8 +51,8 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     metavar='',
 )
 @click.option(
-    '-st',
     '--step',
+    '-st',
     type=click.IntRange(1, 3),
     show_default=True,
     help='Select specific pipeline step',
