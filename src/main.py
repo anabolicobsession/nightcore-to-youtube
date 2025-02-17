@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 @click.command(help="""
 Create slowed and nightcore versions of a track and upload them to YouTube.
 
-<track-directory>: Directory where the track and its cover art are located.
-[<speed> [reverb]]...: Speed and reverb parameters of the final tracks.
+<working-directory>: Directory where the track and its cover art are located
+[<speed> [reverb]]...: Speed and reverb parameters of the final tracks
 """)
 @click.argument(
     'working_directory',
@@ -38,7 +38,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     type=click.IntRange(1, 3),
     default=1,
     show_default=True,
-    help='Starting pipeline step.',
+    help='Starting pipeline step',
     metavar='',
 )
 @click.option(
@@ -47,7 +47,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     type=click.IntRange(1, 3),
     default=3,
     show_default=True,
-    help='Ending pipeline step.',
+    help='Ending pipeline step',
     metavar='',
 )
 @click.option(
@@ -55,14 +55,14 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     '--step',
     type=click.IntRange(1, 3),
     show_default=True,
-    help='Single pipeline step.',
+    help='Select specific pipeline step',
     metavar='',
 )
 @click.option(
     '--gui',
     '-g',
     is_flag=True,
-    help='Run with a graphical interface instead of console mode.',
+    help='Run the `create-nightcore` step with a graphical interface',
 )
 @click.option(
     '--preset',
@@ -70,7 +70,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     type=click.Choice([x.value for x in Preset], case_sensitive=False),
     default=Preset.DEFAULT.value,
     show_default=True,
-    help='Preset for `ffmpeg`.',
+    help='Set preset for the `ffmpeg` in the `nightcore-to-video` step',
 )
 def cli(**kwargs):
     asyncio.run(async_cli(**kwargs))
