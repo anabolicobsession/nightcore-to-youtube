@@ -6,6 +6,9 @@ class WorkingDirectory:
     def __init__(self, path: str | Path):
         self.path = Path(path)
 
+        if not (self.path.exists() and self.path.is_dir()):
+            raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}')
+
     def get_path(self, raise_if_not_exists=False) -> Path:
         if raise_if_not_exists and not self.path.exists():
             raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}')
