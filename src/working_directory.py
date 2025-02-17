@@ -33,6 +33,16 @@ class WorkingDirectory:
 
         return paths[0] if paths else None
 
+    def get_cover_path(self, raise_if_not_exists=False) -> Optional[Path]:
+        paths = [x for x in self.path.iterdir() if self._is_cover_path(x)]
+
+        if raise_if_not_exists and not paths:
+            raise FileNotFoundError(f'Couldn\'t find cover art file in directory: {self.path}')
+        elif len(paths) > 1:
+            raise TooManyFilesError(f'There are multiple cover art files in directory: {self.path}')
+
+        return paths[0] if paths else None
+
     def get_nightcore_paths(self, raise_if_not_exist=False) -> list[Path]:
         paths = [x for x in self.path.iterdir() if self._is_nightcore_path(x)]
 
@@ -47,6 +57,13 @@ class WorkingDirectory:
                 path.is_file() and
                 has_any_of_extensions(path, 'mp3') and
                 not WorkingDirectory._has_nightcore_name(path)
+        )
+
+    @staticmethod
+    def _is_cover_path(path: Path):
+        return (
+                path.is_file() and
+                has_any_of_extensions(path, 'png', 'jpg')
         )
 
     @staticmethod
