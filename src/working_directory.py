@@ -2,21 +2,10 @@ from pathlib import Path
 from typing import Optional
 
 
-Extension = str
-
-
-class TooManyFilesError(Exception):
-    ...
-
-
-def has_any_of_extensions(path: Path, *extensions: Extension):
-    return any(path.suffix.lower() == '.' + x for x in extensions)
-
-
 class WorkingDirectory:
     def __init__(self, path: str | Path):
         self.path = Path(path)
-        
+
     def get_path(self, raise_if_not_exists=False) -> Path:
         if raise_if_not_exists and not self.path.exists():
             raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}')
@@ -77,3 +66,13 @@ class WorkingDirectory:
     @staticmethod
     def _has_nightcore_name(path: Path):
         return all(c.isdigit() or c == '_' for c in path.stem)
+
+
+class TooManyFilesError(Exception):
+    ...
+
+
+Extension = str
+
+def has_any_of_extensions(path: Path, *extensions: Extension):
+    return any(path.suffix.lower() == '.' + x for x in extensions)

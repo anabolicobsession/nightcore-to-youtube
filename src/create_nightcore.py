@@ -12,17 +12,12 @@ DEFAULT_SPEED = 100
 DEFAULT_REVERB = 0
 
 
-logger = logging.getLogger(__name__)
-
-
 Speed = int
 Reverb = int
 SpeedsAndReverbs = list[tuple[Speed, Reverb]]
 
 
-class Selector:
-    PAUSE = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.relative > div.flex.gap-1.items-center.justify-center > button'
-    DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
+logger = logging.getLogger(__name__)
 
 
 async def create_nightcore(
@@ -42,6 +37,12 @@ async def create_nightcore(
         )
         await asyncio.gather(*[_create_nightcore(context, working_directory, *x) for x in speeds_and_reverbs])
         await context.close()
+
+
+def remove_previous_nightcore(working_directory: WorkingDirectory):
+    if paths := working_directory.get_nightcore_paths():
+        for x in paths: x.unlink()
+        logger.info(f'Removed from {working_directory.get_path()}: {", ".join([x.name for x in paths])}')
 
 
 async def _create_nightcore(
@@ -73,10 +74,9 @@ async def _create_nightcore(
     await page.close()
 
 
-def remove_previous_nightcore(working_directory: WorkingDirectory):
-    if paths := working_directory.get_nightcore_paths():
-        for x in paths: x.unlink()
-        logger.info(f'Removed from {working_directory.get_path()}: {", ".join([x.name for x in paths])}')
+class Selector:
+    PAUSE = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.relative > div.flex.gap-1.items-center.justify-center > button'
+    DOWNLOAD = r'body > main > div.container.mx-auto.px-2.md\:px-5.mt-5.sm\:mt-20.md\:mt-36.text-center > div > div.mt-10.space-y-2.max-w-\[300px\].mx-auto > button:nth-child(1)'
 
 
 class Downloader:
