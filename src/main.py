@@ -85,7 +85,6 @@ async def async_cli(
         gui: bool,
         preset: str,
 ):
-
     # parameter validation
     if not (start_step <= end_step):
         raise click.BadParameter(f'The starting step ({start_step}) must be greater than or equal to the ending step ({end_step}).')
