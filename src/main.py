@@ -1,11 +1,12 @@
 import asyncio
 import logging
-from enum import Enum
+from enum import Enum, auto
 from pathlib import Path
 
 import click
 
 from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
+from src.nightcore_to_video import Preset, nightcore_to_video
 from src.working_directory import WorkingDirectory
 
 
@@ -63,6 +64,14 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     is_flag=True,
     help='Run with a graphical interface instead of console mode.',
 )
+@click.option(
+    '--preset',
+    '-p',
+    type=click.Choice([x.value for x in Preset], case_sensitive=False),
+    default=Preset.DEFAULT.value,
+    show_default=True,
+    help='Preset for `ffmpeg`.',
+)
 def cli(**kwargs):
     asyncio.run(async_cli(**kwargs))
 
@@ -74,6 +83,7 @@ async def async_cli(
         end_step: int,
         step: int,
         gui: bool,
+        preset: str,
 ):
 
     # parameter validation
@@ -90,18 +100,24 @@ async def async_cli(
             raise click.MissingParameter("At least one speed parameter of the final track is required if 'create-nightcore' step is involved")
 
 
-    # convertion
+    # conversions
     working_directory = WorkingDirectory(working_directory)
+    preset = Preset(preset)
 
 
     # pipeline steps
     if has_step(Step.CREATE_NIGHTCORE):
-        logger.info(f'{Step.CREATE_NIGHTCORE.value}. Starting nightcore creation')
+        logger.info(f'{Step.CREATE_NIGHTCORE.value}. Creating nightcore')
         await create_nightcore(working_directory, speed_and_reverbs, gui=gui)
+
+    if has_step(Step.NIGHTCORE_TO_VIDEO):
+        logger.info(f'{Step.NIGHTCORE_TO_VIDEO.value}. Converting nightcore to video')
+        nightcore_to_video(working_directory, preset=preset)
 
 
 class Step(Enum):
-    CREATE_NIGHTCORE = 1
+    CREATE_NIGHTCORE = auto()
+    NIGHTCORE_TO_VIDEO = auto()
 
 
 def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> SpeedsAndReverbs:
