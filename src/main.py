@@ -2,6 +2,7 @@ import asyncio
 import logging
 from enum import Enum, auto
 from pathlib import Path
+from typing import Self
 
 import click
 
@@ -12,6 +13,43 @@ from src.working_directory import WorkingDirectory
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
+
+
+class RangeParamType(click.ParamType):
+    name = 'range'
+    TYPE = (int, int)
+
+    def __init__(self, min_start=None, max_end=None):
+        self.min_start = min_start
+        self.max_end = max_end
+
+    def convert(self, value, param, ctx) -> TYPE:
+        try:
+            start, end = map(int, value.split(':'))
+            if not (start <= end): raise ValueError('Start should be less or equal to end')
+            if not (self._is_within_range(start) and self._is_within_range(end)): raise ValueError(f'Given range is not within allowed range: `{self.min_start}:{self.max_end}`')
+            return start, end
+
+        except Exception as e:
+            self.fail(f'Invalid range format: `{value}`. Expected format: `start:end`. Error: {str(e)}', param, ctx)
+
+    def _is_within_range(self, x: int):
+        return self.min_start <= x <= self.max_end
+
+
+class Step(Enum):
+    CREATE_NIGHTCORE = auto()
+    NIGHTCORE_TO_VIDEO = auto()
+
+    @classmethod
+    @property
+    def min(cls) -> Self:
+        return min(cls, key=lambda step: step.value)
+
+    @classmethod
+    @property
+    def max(cls) -> Self:
+        return max(cls, key=lambda step: step.value)
 
 
 @click.command(help="""
@@ -33,28 +71,18 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     metavar='[<speed> [reverb]]...',
 )
 @click.option(
-    '--start-step',
-    '-s',
-    type=click.IntRange(1, 3),
-    default=1,
+    '--steps',
+    '-ss',
+    type=RangeParamType(min_start=Step.min.value, max_end=Step.max.value),
+    default=f'{Step.min.value}:{Step.max.value}',
     show_default=True,
-    help='Starting pipeline step',
-    metavar='',
-)
-@click.option(
-    '--end-step',
-    '-e',
-    type=click.IntRange(1, 3),
-    default=3,
-    show_default=True,
-    help='Ending pipeline step',
+    help='Select pipeline steps using range',
     metavar='',
 )
 @click.option(
     '--step',
-    '-st',
-    type=click.IntRange(1, 3),
-    show_default=True,
+    '-s',
+    type=click.IntRange(Step.min.value, Step.max.value),
     help='Select specific pipeline step',
     metavar='',
 )
@@ -79,19 +107,16 @@ def cli(**kwargs):
 async def async_cli(
         working_directory: Path,
         speeds_and_reverbs: tuple[int],
-        start_step: int,
-        end_step: int,
+        steps: RangeParamType.TYPE,
         step: int,
         gui: bool,
         preset: str,
 ):
-    # parameter validation
-    if not (start_step <= end_step):
-        raise click.BadParameter(f'The starting step ({start_step}) must be greater than or equal to the ending step ({end_step}).')
-
     def has_step(checked_step: Step):
-        return checked_step.value in {step} if step else set(range(start_step, end_step + 1))
+        return checked_step.value in set(range(steps[0], steps[1] + 1) if not step else [step])
 
+
+    # parameter validation
     speed_and_reverbs = extract_speed_and_reverb_tuples(speeds_and_reverbs)
 
     if has_step(Step.CREATE_NIGHTCORE):
@@ -112,11 +137,6 @@ async def async_cli(
     if has_step(Step.NIGHTCORE_TO_VIDEO):
         logger.info(f'{Step.NIGHTCORE_TO_VIDEO.value}. Converting nightcore to video')
         nightcore_to_video(working_directory, preset=preset)
-
-
-class Step(Enum):
-    CREATE_NIGHTCORE = auto()
-    NIGHTCORE_TO_VIDEO = auto()
 
 
 def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> SpeedsAndReverbs:
