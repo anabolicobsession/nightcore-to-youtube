@@ -34,6 +34,8 @@ def nightcore_to_video(
         working_directory: WorkingDirectory,
         preset: Preset = Preset.DEFAULT,
 ):
+    remove_previous_video(working_directory)
+
     nightcores = working_directory.get_nightcore_paths(raise_if_not_exist=True)
     cover = working_directory.get_cover_path()
     videos = [x.with_suffix('.mp4') for x in nightcores]
@@ -49,6 +51,12 @@ def nightcore_to_video(
 
     with multiprocessing.Pool(processes=processes) as pool:
         pool.starmap(_nightcore_to_video, args)
+
+
+def remove_previous_video(working_directory: WorkingDirectory):
+    if paths := working_directory.get_video_paths():
+        for video in paths: video.unlink()
+        logger.info(f'Removed from {working_directory.get_path()}: {", ".join([x.name for x in paths])}')
 
 
 def _nightcore_to_video(

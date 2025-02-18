@@ -43,6 +43,14 @@ class WorkingDirectory:
 
         return paths
 
+    def get_video_paths(self, raise_if_not_exist=False) -> list[Path]:
+        paths = [x for x in self.path.iterdir() if self._is_video_path(x)]
+
+        if raise_if_not_exist and not paths:
+            raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: {self.path}')
+
+        return paths
+
     @staticmethod
     def _is_track_path(path: Path):
         return (
@@ -64,6 +72,13 @@ class WorkingDirectory:
                 path.is_file() and
                 has_any_of_extensions(path, 'mp3') and
                 WorkingDirectory._has_nightcore_name(path)
+        )
+
+    @staticmethod
+    def _is_video_path(path: Path):
+        return (
+                path.is_file() and
+                has_any_of_extensions(path, 'mp4')
         )
 
     @staticmethod
