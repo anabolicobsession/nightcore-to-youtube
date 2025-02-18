@@ -121,7 +121,7 @@ async def async_cli(
 
     if has_step(Step.CREATE_NIGHTCORE):
         if not speed_and_reverbs:
-            raise click.MissingParameter("At least one speed parameter of the final track is required if 'create-nightcore' step is involved")
+            raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
 
 
     # conversions
