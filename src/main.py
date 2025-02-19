@@ -1,6 +1,8 @@
 import asyncio
 import logging
+import time
 from enum import Enum, auto
+from functools import partial
 from pathlib import Path
 from typing import Self
 
@@ -130,13 +132,27 @@ async def async_cli(
 
 
     # pipeline steps
-    if has_step(Step.CREATE_NIGHTCORE):
-        logger.info(f'{Step.CREATE_NIGHTCORE.value}. Creating nightcore')
-        await create_nightcore(working_directory, speed_and_reverbs, gui=gui)
+    start_total_time = time.time()
 
-    if has_step(Step.NIGHTCORE_TO_VIDEO):
-        logger.info(f'{Step.NIGHTCORE_TO_VIDEO.value}. Converting nightcore to video')
-        nightcore_to_video(working_directory, preset=preset)
+    for current_step, log_message, callback in [
+        (
+                Step.CREATE_NIGHTCORE,
+                'Creating nightcore',
+                create_nightcore(working_directory, speed_and_reverbs, gui=gui),
+        ),
+        (
+                Step.NIGHTCORE_TO_VIDEO,
+                'Converting nightcore to video',
+                partial(nightcore_to_video, working_directory, preset=preset),
+        ),
+    ]:
+        if has_step(current_step):
+            logger.info(f'{current_step.value}. {log_message}')
+            start_time = time.time()
+            callback() if isinstance(callback, partial) else await callback
+            logger.info(f'Step execution time: {int(time.time() - start_time):.0f}s')
+
+    logger.info(f'Pipeline execution time: {int(time.time() - start_total_time):.0f}s')
 
 
 def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> SpeedsAndReverbs:
