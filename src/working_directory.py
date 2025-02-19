@@ -10,11 +10,11 @@ class WorkingDirectory:
         self.path = Path(path)
 
         if not (self.path.exists() and self.path.is_dir()):
-            raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}')
+            raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}/')
 
     def get_path(self, raise_if_not_exists=False) -> Path:
         if raise_if_not_exists and not self.path.exists():
-            raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}')
+            raise FileNotFoundError(f'Working directory doesn\'t exist: {self.path}/')
 
         return self.path
 
@@ -22,9 +22,9 @@ class WorkingDirectory:
         paths = [x for x in self.path.iterdir() if self._is_track_path(x)]
 
         if raise_if_not_exists and not paths:
-            raise FileNotFoundError(f'Couldn\'t find track file in directory: {self.path}')
+            raise FileNotFoundError(f'Couldn\'t find track file in directory: {self.path}/')
         elif len(paths) > 1:
-            raise TooManyFilesError(f'There are multiple track files in directory: {self.path}')
+            raise TooManyFilesError(f'There are multiple track files in directory: {self.path}/')
 
         return paths[0] if paths else None
 
@@ -32,9 +32,9 @@ class WorkingDirectory:
         paths = [x for x in self.path.iterdir() if self._is_cover_path(x)]
 
         if raise_if_not_exists and not paths:
-            raise FileNotFoundError(f'Couldn\'t find cover art file in directory: {self.path}')
+            raise FileNotFoundError(f'Couldn\'t find cover art file in directory: {self.path}/')
         elif len(paths) > 1:
-            raise TooManyFilesError(f'There are multiple cover art files in directory: {self.path}')
+            raise TooManyFilesError(f'There are multiple cover art files in directory: {self.path}/')
 
         return paths[0] if paths else None
 
@@ -42,7 +42,7 @@ class WorkingDirectory:
         paths = [x for x in self.path.iterdir() if self._is_nightcore_path(x)]
 
         if raise_if_not_exist and not paths:
-            raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: {self.path}')
+            raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: {self.path}/')
 
         return paths
 
@@ -50,7 +50,7 @@ class WorkingDirectory:
         paths = [x for x in self.path.iterdir() if self._is_video_path(x)]
 
         if raise_if_not_exist and not paths:
-            raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: {self.path}')
+            raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: {self.path}/')
 
         return paths
 
