@@ -2,6 +2,9 @@ from pathlib import Path
 from typing import Optional
 
 
+SPEED_REVERB_SEPARATOR = '_'
+
+
 class WorkingDirectory:
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -50,6 +53,13 @@ class WorkingDirectory:
             raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: {self.path}')
 
         return paths
+
+    def speed_and_reverb_to_path(self, speed, reverb, extension) -> Path:
+        return self.path / f'{speed}{SPEED_REVERB_SEPARATOR}{reverb}.{extension}'
+
+    @staticmethod
+    def path_to_speed_and_reverb(path: Path) -> (int, int):
+        return tuple(map(int, path.stem.split(SPEED_REVERB_SEPARATOR)))
 
     @staticmethod
     def _is_track_path(path: Path):

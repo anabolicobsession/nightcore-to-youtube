@@ -67,7 +67,7 @@ def _nightcore_to_video(
 ):
     with Image.open(cover) as x:
         width, height = x.size
-        speed, reverb = tuple(int(x) for x in nightcore.stem.split('_'))
+        speed, reverb = WorkingDirectory.path_to_speed_and_reverb(nightcore)
 
         new_width = round(height * 16 / 9)
         if new_width % 2 != 0: new_width += 1
