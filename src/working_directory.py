@@ -90,7 +90,8 @@ class WorkingDirectory:
     def _is_video_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'mp4')
+                has_any_of_extensions(path, 'mp4') and
+                WorkingDirectory._has_nightcore_stem(path)
         )
 
     @staticmethod
