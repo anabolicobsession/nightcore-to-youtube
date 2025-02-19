@@ -106,4 +106,4 @@ class TooManyFilesError(Exception):
 Extension = str
 
 def has_any_of_extensions(path: Path, *extensions: Extension):
-    return any(path.suffix.lower() == '.' + x for x in extensions)
+    return any(path.suffix.casefold() == '.' + x for x in extensions)
