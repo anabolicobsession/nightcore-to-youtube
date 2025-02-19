@@ -1,8 +1,10 @@
+import re
 from pathlib import Path
 from typing import Optional
 
 
 SPEED_REVERB_SEPARATOR = '_'
+NIGHTCORE_PATTERN = re.compile(rf'\d+(?:{SPEED_REVERB_SEPARATOR}\d+)?')
 
 
 class WorkingDirectory:
@@ -66,7 +68,7 @@ class WorkingDirectory:
         return (
                 path.is_file() and
                 has_any_of_extensions(path, 'mp3') and
-                not WorkingDirectory._has_nightcore_name(path)
+                not WorkingDirectory._has_nightcore_stem(path)
         )
 
     @staticmethod
@@ -81,7 +83,7 @@ class WorkingDirectory:
         return (
                 path.is_file() and
                 has_any_of_extensions(path, 'mp3') and
-                WorkingDirectory._has_nightcore_name(path)
+                WorkingDirectory._has_nightcore_stem(path)
         )
 
     @staticmethod
@@ -92,8 +94,8 @@ class WorkingDirectory:
         )
 
     @staticmethod
-    def _has_nightcore_name(path: Path):
-        return all(c.isdigit() or c == '_' for c in path.stem)
+    def _has_nightcore_stem(path: Path):
+        return bool(NIGHTCORE_PATTERN.fullmatch(path.stem))
 
 
 class TooManyFilesError(Exception):
