@@ -114,26 +114,23 @@ async def async_cli(
         gui: bool,
         preset: str,
 ):
+    # parameter validation
+    working_directory = WorkingDirectory(working_directory)
+    speed_and_reverbs = extract_speed_and_reverb_tuples(speeds_and_reverbs)
+    preset = Preset(preset)
+
+    logger.info(f'Detected track: "{working_directory.get_track_path(raise_if_not_exists=True).stem}"')
+
     def has_step(checked_step: Step):
         return checked_step.value in set(range(steps[0], steps[1] + 1) if not step else [step])
-
-
-    # parameter validation
-    speed_and_reverbs = extract_speed_and_reverb_tuples(speeds_and_reverbs)
 
     if has_step(Step.CREATE_NIGHTCORE):
         if not speed_and_reverbs:
             raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
 
 
-    # conversions
-    working_directory = WorkingDirectory(working_directory)
-    preset = Preset(preset)
-
-
     # pipeline steps
     start_total_time = time.time()
-    is_not_first = False
 
     for current_step, log_message, callback in [
         (
@@ -148,7 +145,7 @@ async def async_cli(
         ),
     ]:
         if has_step(current_step):
-            logger.info('') if is_not_first else (is_not_first := True)
+            logger.info('')
             logger.info(f'{current_step.value}. {log_message}')
             start_time = time.time()
             callback() if isinstance(callback, partial) else await callback
