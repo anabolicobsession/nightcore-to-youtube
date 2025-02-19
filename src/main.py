@@ -133,6 +133,7 @@ async def async_cli(
 
     # pipeline steps
     start_total_time = time.time()
+    is_not_first = False
 
     for current_step, log_message, callback in [
         (
@@ -147,11 +148,13 @@ async def async_cli(
         ),
     ]:
         if has_step(current_step):
+            logger.info('') if is_not_first else (is_not_first := True)
             logger.info(f'{current_step.value}. {log_message}')
             start_time = time.time()
             callback() if isinstance(callback, partial) else await callback
             logger.info(f'Step execution time: {int(time.time() - start_time):.0f}s')
 
+    logger.info('')
     logger.info(f'Pipeline execution time: {int(time.time() - start_total_time):.0f}s')
 
 
