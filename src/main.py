@@ -8,8 +8,7 @@ from typing import Self
 
 import click
 
-import config
-from src import param_types
+from src import config, param_types
 from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
 from src.nightcore_to_video import Preset, nightcore_to_video
 from src.working_directory import WorkingDirectory
