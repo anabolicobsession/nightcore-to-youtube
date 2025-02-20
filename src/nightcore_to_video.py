@@ -9,7 +9,11 @@ from typing import Self
 import ffmpeg
 from PIL import Image
 
+from src import config
 from src.working_directory import WorkingDirectory
+
+
+Ratio = float
 
 
 logger = logging.getLogger(__name__)
@@ -33,6 +37,7 @@ class Preset(Enum):
 def nightcore_to_video(
         working_directory: WorkingDirectory,
         preset: Preset = Preset.DEFAULT,
+        ratio: Ratio = config.MIN_VIDEO_RATIO,
 ):
     remove_previous_video(working_directory)
 
@@ -45,7 +50,8 @@ def nightcore_to_video(
         nightcores,
         [cover] * len(nightcores),
         videos,
-        [preset] * N
+        [preset] * N,
+        [ratio] * N,
     )
     processes = min(multiprocessing.cpu_count(), len(nightcores))
 
@@ -64,12 +70,13 @@ def _nightcore_to_video(
         cover: Path,
         video: Path,
         preset: Preset,
+        ratio: Ratio,
 ):
     with Image.open(cover) as x:
         width, height = x.size
         speed, reverb = WorkingDirectory.path_to_speed_and_reverb(nightcore)
 
-        new_width = round(height * 16 / 9)
+        new_width = round(height * ratio)
         if new_width % 2 != 0: new_width += 1
 
         def wrap_log(log: str):

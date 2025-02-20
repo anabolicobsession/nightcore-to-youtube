@@ -8,6 +8,7 @@ from typing import Self
 
 import click
 
+import config
 from src import param_types
 from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
 from src.nightcore_to_video import Preset, nightcore_to_video
@@ -81,6 +82,15 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     show_default=True,
     help='Set preset for the `ffmpeg` in the `nightcore-to-video` step',
 )
+@click.option(
+    '--ratio',
+    '-r',
+    type=param_types.RatioParamType(min_ratio=config.MIN_VIDEO_RATIO, max_ratio=config.MAX_VIDEO_RATIO),
+    default='16:9',
+    show_default=True,
+    help='Select nightcore video ratio',
+    metavar='',
+)
 def cli(**kwargs):
     asyncio.run(async_cli(**kwargs))
 
@@ -92,6 +102,7 @@ async def async_cli(
         step: int,
         gui: bool,
         preset: str,
+        ratio: param_types.RatioParamType.TYPE,
 ):
     # parameter validation
     working_directory = WorkingDirectory(working_directory)
@@ -120,7 +131,7 @@ async def async_cli(
         (
                 Step.NIGHTCORE_TO_VIDEO,
                 'Converting nightcore to video',
-                partial(nightcore_to_video, working_directory, preset=preset),
+                partial(nightcore_to_video, working_directory, preset=preset, ratio=ratio),
         ),
     ]:
         if has_step(current_step):
