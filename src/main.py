@@ -88,7 +88,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     type=param_types.RatioParamType(min_ratio=config.MIN_VIDEO_RATIO, max_ratio=config.MAX_VIDEO_RATIO),
     default='16:9',
     show_default=True,
-    help='Select nightcore video ratio',
+    help='Select a nightcore video ratio in the form of `width:height`',
     metavar='',
 )
 def cli(**kwargs):
