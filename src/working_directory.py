@@ -67,7 +67,7 @@ class WorkingDirectory:
     def _is_track_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'mp3') and
+                has_any_of_extensions(path, 'mp3', 'opus') and
                 not WorkingDirectory._has_nightcore_stem(path)
         )
 
@@ -82,7 +82,7 @@ class WorkingDirectory:
     def _is_nightcore_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'mp3') and
+                has_any_of_extensions(path, 'mp3', 'opus') and
                 WorkingDirectory._has_nightcore_stem(path)
         )
 
