@@ -1,7 +1,11 @@
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Iterable, Optional
 
+
+AUDIO_EXTENSIONS = ['mp3', 'opus']
+IMAGE_EXTENSIONS = ['png', 'jpg']
+VIDEO_EXTENSIONS = ['mp4']
 
 SPEED_REVERB_SEPARATOR = '_'
 NIGHTCORE_PATTERN = re.compile(rf'\d+(?:{SPEED_REVERB_SEPARATOR}\d+)?')
@@ -67,7 +71,7 @@ class WorkingDirectory:
     def _is_track_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'mp3', 'opus') and
+                has_any_of_extensions(path, AUDIO_EXTENSIONS) and
                 not WorkingDirectory._has_nightcore_stem(path)
         )
 
@@ -75,14 +79,14 @@ class WorkingDirectory:
     def _is_cover_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'png', 'jpg')
+                has_any_of_extensions(path, IMAGE_EXTENSIONS)
         )
 
     @staticmethod
     def _is_nightcore_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'mp3', 'opus') and
+                has_any_of_extensions(path, AUDIO_EXTENSIONS) and
                 WorkingDirectory._has_nightcore_stem(path)
         )
 
@@ -90,7 +94,7 @@ class WorkingDirectory:
     def _is_video_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, 'mp4') and
+                has_any_of_extensions(path, VIDEO_EXTENSIONS) and
                 WorkingDirectory._has_nightcore_stem(path)
         )
 
@@ -105,5 +109,5 @@ class TooManyFilesError(Exception):
 
 Extension = str
 
-def has_any_of_extensions(path: Path, *extensions: Extension):
+def has_any_of_extensions(path: Path, extensions: Iterable[Extension]):
     return any(path.suffix.casefold() == '.' + x for x in extensions)
