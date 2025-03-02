@@ -1,8 +1,8 @@
 import asyncio
+import inspect
 import logging
 import time
 from enum import Enum, auto
-from functools import partial
 from pathlib import Path
 from typing import Self
 
@@ -125,19 +125,22 @@ async def async_cli(
         (
                 Step.CREATE_NIGHTCORE,
                 'Creating nightcore',
-                create_nightcore(working_directory, speed_and_reverbs, gui=gui),
+                lambda: create_nightcore(working_directory, speed_and_reverbs, gui=gui),
         ),
         (
                 Step.NIGHTCORE_TO_VIDEO,
                 'Converting nightcore to video',
-                partial(nightcore_to_video, working_directory, preset=preset, ratio=ratio),
+                lambda: nightcore_to_video(working_directory, preset=preset, ratio=ratio),
         ),
     ]:
         if has_step(current_step):
             logger.info('')
             logger.info(f'{current_step.value}. {log_message}')
             start_time = time.time()
-            callback() if isinstance(callback, partial) else await callback
+
+            result = callback()
+            if inspect.isawaitable(result): await result
+
             logger.info(f'Step execution time: {int(time.time() - start_time):.0f}s')
 
     logger.info('')
