@@ -1,14 +1,7 @@
-import re
 from pathlib import Path
 from typing import Iterable, Optional
 
-
-AUDIO_EXTENSIONS = ['mp3', 'opus']
-IMAGE_EXTENSIONS = ['png', 'jpg']
-VIDEO_EXTENSIONS = ['mp4']
-
-SPEED_REVERB_SEPARATOR = '_'
-NIGHTCORE_PATTERN = re.compile(rf'\d+(?:{SPEED_REVERB_SEPARATOR}\d+)?')
+from src import config
 
 
 class WorkingDirectory:
@@ -61,17 +54,17 @@ class WorkingDirectory:
         return paths
 
     def speed_and_reverb_to_path(self, speed, reverb, extension) -> Path:
-        return self.path / f'{speed}{SPEED_REVERB_SEPARATOR}{reverb}.{extension}'
+        return self.path / f'{speed}{config.SPEED_REVERB_NAME_SEPARATOR}{reverb}.{extension}'
 
     @staticmethod
     def path_to_speed_and_reverb(path: Path) -> (int, int):
-        return tuple(map(int, path.stem.split(SPEED_REVERB_SEPARATOR)))
+        return tuple(map(int, path.stem.split(config.SPEED_REVERB_NAME_SEPARATOR)))
 
     @staticmethod
     def _is_track_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, AUDIO_EXTENSIONS) and
+                has_any_of_extensions(path, config.AUDIO_EXTENSIONS) and
                 not WorkingDirectory._has_nightcore_stem(path)
         )
 
@@ -79,14 +72,14 @@ class WorkingDirectory:
     def _is_cover_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, IMAGE_EXTENSIONS)
+                has_any_of_extensions(path, config.COVER_EXTENSIONS)
         )
 
     @staticmethod
     def _is_nightcore_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, AUDIO_EXTENSIONS) and
+                has_any_of_extensions(path, config.AUDIO_EXTENSIONS) and
                 WorkingDirectory._has_nightcore_stem(path)
         )
 
@@ -94,13 +87,13 @@ class WorkingDirectory:
     def _is_video_path(path: Path):
         return (
                 path.is_file() and
-                has_any_of_extensions(path, VIDEO_EXTENSIONS) and
+                has_any_of_extensions(path, config.VIDEO_EXTENSIONS) and
                 WorkingDirectory._has_nightcore_stem(path)
         )
 
     @staticmethod
     def _has_nightcore_stem(path: Path):
-        return bool(NIGHTCORE_PATTERN.fullmatch(path.stem))
+        return bool(config.NIGHTCORE_NAME_PATTERN.fullmatch(path.stem))
 
 
 class TooManyFilesError(Exception):
