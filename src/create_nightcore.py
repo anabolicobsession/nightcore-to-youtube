@@ -38,7 +38,7 @@ async def create_nightcore(
 def remove_previous_nightcore(working_directory: WorkingDirectory):
     if paths := working_directory.get_nightcore_paths():
         for x in paths: x.unlink()
-        logger.info(f'Removed from `{working_directory.get_path()}/`: {", ".join(["`" + x.name + "`" for x in paths])}')
+        logger.info(f'Removed obsolete files: {", ".join(["`" + x.name + "`" for x in paths])}')
 
 
 async def _create_nightcore(

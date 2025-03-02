@@ -62,7 +62,7 @@ def nightcore_to_video(
 def remove_previous_video(working_directory: WorkingDirectory):
     if paths := working_directory.get_video_paths():
         for video in paths: video.unlink()
-        logger.info(f'Removed from `{working_directory.get_path()}/`: {", ".join(["`" + x.name + "`" for x in paths])}')
+        logger.info(f'Removed obsolete files: {", ".join(["`" + x.name + "`" for x in paths])}')
 
 
 def _nightcore_to_video(
