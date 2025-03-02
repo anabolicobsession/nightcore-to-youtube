@@ -103,8 +103,8 @@ async def async_cli(
         preset: str,
         ratio: param_types.RatioParamType.TYPE,
 ):
-    # parameter validation
-    working_directory = WorkingDirectory(working_directory)
+    # parameter validation and conversion
+    working_directory = WorkingDirectory(working_directory.resolve())
     speed_and_reverbs = extract_speed_and_reverb_tuples(speeds_and_reverbs)
     preset = Preset(preset)
 
