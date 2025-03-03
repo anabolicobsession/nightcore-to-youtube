@@ -4,7 +4,5 @@ __pycache__/
 client_secret*
 credentials/token.pickle
 
-test_directory/
-test.sh
-
 playground/
+test_directory/
