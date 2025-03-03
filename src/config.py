@@ -12,6 +12,11 @@ SPEED_REVERB_NAME_SEPARATOR = '_'
 NIGHTCORE_NAME_PATTERN = re.compile(rf'\d+(?:{SPEED_REVERB_NAME_SEPARATOR}\d+)?')
 
 
+# create-nightcore
+STANDARD_SPEED = 100
+STANDARD_REVERB = 0
+
+
 # nightcore-to-video
 MIN_VIDEO_RATIO = 16 / 9
 MAX_VIDEO_RATIO = 32 / 9
