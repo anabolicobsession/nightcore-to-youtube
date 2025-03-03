@@ -1,5 +1,6 @@
 import logging
 import pickle
+from pathlib import Path
 
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -65,15 +66,55 @@ def generate_speed_names(amount_slowed, amount_sped_up):
     return [SLOWED_NAMES[x] for x in slowed] + [SPED_UP_NAMES[x] for x in sped_up]
 
 
-def upload_to_youtube(working_directory: WorkingDirectory):
-    service = build('youtube', 'v3', credentials=get_credentials())
+def upload_video(
+        service,
+        path: Path,
+        artist: str,
+        name: str,
+        speed_name: str,
+        is_sped_up: bool = False,
+):
+    # setting up metadata
+    title = f'{artist} - {name} ({speed_name})'
+    logger.info(f'Uploading: \'{title}\'')
 
+    print([artist.lower(), name.lower(), *(['sped up', 'nightcore'] if is_sped_up else ['slowed', 'slowed reverb'])])
+    return
+
+    body = {
+        'snippet': {
+            'title': title,
+            'tags': [artist.lower(), name.lower(), *(['sped up', 'nightcore'] if is_sped_up else ['slowed', 'slowed reverb'])],
+            'categoryId': '10',  # music category
+        },
+        'status': {
+            'privacyStatus': 'public',
+            'madeForKids': False
+        }
+    }
+
+
+def upload_to_youtube(working_directory: WorkingDirectory):
     # sort videos by speed
     videos = working_directory.get_video_paths(raise_if_not_exist=True)
     speeds = [working_directory.path_to_speed_and_reverb(x)[0] for x in videos]
 
     amount_slowed = len([x for x in sorted(speeds) if x < config.STANDARD_SPEED])
     sorted_speed_names = generate_speed_names(amount_slowed=amount_slowed, amount_sped_up=len(speeds) - amount_slowed)
-
     sorted_videos_and_speeds = sorted(zip(videos, speeds), key=lambda x: x[1])
-    sorted_videos = list(zip(*sorted_videos_and_speeds))[0]
+
+
+    # upload videos
+    service = build('youtube', 'v3', credentials=get_credentials())
+    track_name = working_directory.get_track_path(raise_if_not_exists=True).stem
+
+    for video, speed, speed_name in zip(*zip(*sorted_videos_and_speeds), sorted_speed_names):
+        artist, name = tuple(track_name.split(' - ', 1))
+        upload_video(
+            service,
+            path=video,
+            artist=artist,
+            name=name,
+            speed_name=speed_name,
+            is_sped_up=speed > config.STANDARD_SPEED,
+        )
