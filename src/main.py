@@ -11,6 +11,7 @@ import click
 from src import config, param_types
 from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
 from src.nightcore_to_video import Preset, nightcore_to_video
+from src.upload_to_youtube import upload_to_youtube
 from src.working_directory import WorkingDirectory
 
 
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 class Step(Enum):
     CREATE_NIGHTCORE = auto()
     NIGHTCORE_TO_VIDEO = auto()
+    UPLOAD_TO_YOUTUBE = auto()
 
     @classmethod
     @property
@@ -131,6 +133,11 @@ async def async_cli(
                 Step.NIGHTCORE_TO_VIDEO,
                 'Converting nightcore to video',
                 lambda: nightcore_to_video(working_directory, preset=preset, ratio=ratio),
+        ),
+        (
+                Step.UPLOAD_TO_YOUTUBE,
+                'Uploading videos to YouTube',
+                lambda: upload_to_youtube(working_directory),
         ),
     ]:
         if has_step(current_step):

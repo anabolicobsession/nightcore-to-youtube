@@ -1,8 +1,6 @@
 __pycache__/
 .idea/
 
-client_secret*
-credentials/token.pickle
-
 playground/
 test_directory/
+.credentials/

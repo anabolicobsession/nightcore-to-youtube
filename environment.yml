@@ -173,6 +173,19 @@ dependencies:
   - zstandard=0.23.0
   - zstd=1.5.6
   - pip:
+      - google-api-core==2.24.1
+      - google-api-python-client==2.162.0
+      - google-auth-httplib2==0.2.0
+      - google-auth-oauthlib==1.2.1
+      - googleapis-common-protos==1.68.0
       - greenlet==3.1.1
+      - httplib2==0.22.0
+      - oauth2client==3.0.0
+      - oauthlib==3.2.2
       - playwright==1.49.1
+      - proto-plus==1.26.0
+      - protobuf==5.29.3
       - pyee==12.0.0
+      - pyparsing==3.2.1
+      - requests-oauthlib==2.0.0
+      - uritemplate==4.1.1
