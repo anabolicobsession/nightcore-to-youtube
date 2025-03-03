@@ -96,7 +96,7 @@ class Downloader:
 
 
 async def set_nightcore_parameters(page, speed=100, reverb=0):
-    await page.move_slider('div[role="slider"][aria-valuemin="-60"][aria-valuemax="0"]', 300)
+    await page.move_slider('div[role="slider"][aria-valuemin="-60"][aria-valuemax="0"]', 300)  # set standard volume (100% - maximum)
     await page.set_slider_value('div[role="slider"][aria-valuemin="0.5"][aria-valuemax="2"]', speed / 100, step=0.01)
     await page.set_slider_value('div[role="slider"][aria-valuemin="0.01"][aria-valuemax="10"]', reverb / 10 + 0.01, step=0.05)
 
