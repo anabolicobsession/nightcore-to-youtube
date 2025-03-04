@@ -1,5 +1,6 @@
 import logging
 import pickle
+import re
 from pathlib import Path
 
 from google.auth.transport.requests import Request
@@ -66,6 +67,10 @@ def generate_speed_names(amount_slowed, amount_sped_up):
     return [SLOWED_NAMES[x] for x in slowed] + [SPED_UP_NAMES[x] for x in sped_up]
 
 
+def split_artists(artists) -> list[str]:
+    return re.split(fr'\s*[{config.ARTIST_SEPARATORS}]\s*', artists)
+
+
 def upload_video(
         service,
         path: Path,
@@ -76,15 +81,20 @@ def upload_video(
 ):
     # setting up metadata
     title = f'{artist} - {name} ({speed_name})'
-    logger.info(f'Uploading: \'{title}\'')
+    artists = split_artists(artist)
+    tags = [
+        *[x.lower() for x in artists],
+        name.lower(),
+        *(['sped up', 'nightcore'] if is_sped_up else ['slowed', 'slowed reverb'])
+    ]
 
-    print([artist.lower(), name.lower(), *(['sped up', 'nightcore'] if is_sped_up else ['slowed', 'slowed reverb'])])
-    return
+    logger.info(f'Uploading: \'{title}\'')
+    logger.info(f'Tags: {", ".join([x for x in tags])}')
 
     body = {
         'snippet': {
             'title': title,
-            'tags': [artist.lower(), name.lower(), *(['sped up', 'nightcore'] if is_sped_up else ['slowed', 'slowed reverb'])],
+            'tags': tags,
             'categoryId': '10',  # music category
         },
         'status': {
