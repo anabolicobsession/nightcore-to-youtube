@@ -107,14 +107,13 @@ async def async_cli(
 ):
     # parameter validation and conversion
     working_directory = WorkingDirectory(working_directory.resolve())
-    speed_and_reverbs = extract_speed_and_reverb_tuples(speeds_and_reverbs)
     preset = Preset(preset)
 
     def has_step(checked_step: Step):
         return checked_step.value in set(range(steps[0], steps[1] + 1) if not step else [step])
 
     if has_step(Step.CREATE_NIGHTCORE):
-        if not speed_and_reverbs:
+        if not (speeds_and_reverbs := extract_speed_and_reverb_tuples(speeds_and_reverbs)):
             raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
 
     logger.info(f'Detected track: \'{working_directory.get_track_path(raise_if_not_exists=True).stem}\'')
@@ -127,7 +126,7 @@ async def async_cli(
         (
                 Step.CREATE_NIGHTCORE,
                 'Creating nightcore',
-                lambda: create_nightcore(working_directory, speed_and_reverbs, gui=gui),
+                lambda: create_nightcore(working_directory, speeds_and_reverbs, gui=gui),
         ),
         (
                 Step.NIGHTCORE_TO_VIDEO,
