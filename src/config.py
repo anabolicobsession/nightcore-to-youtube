@@ -8,8 +8,19 @@ AUDIO_EXTENSIONS = ['mp3', 'opus']
 COVER_EXTENSIONS = ['png', 'jpg']
 VIDEO_EXTENSIONS = ['mp4']
 
+ARTIST_SEPARATORS = ',&'
+
 SPEED_REVERB_NAME_SEPARATOR = '_'
 NIGHTCORE_NAME_PATTERN = re.compile(rf'\d+(?:{SPEED_REVERB_NAME_SEPARATOR}\d+)?')
+
+METADATA_DISCOVERY_YEARS = list(range(2023, 2100))
+METADATA_DISCOVERY_SEASONS = [1, 2, 3, 4]
+METADATA_PLAYLISTS_MAPPING = {
+    'w': 'west',
+    'p': 'phonk',
+    'e': 'electronic',
+    's': 'east',
+}
 
 
 # create-nightcore
@@ -35,5 +46,3 @@ QUATH_SCOPES = [
     'https://www.googleapis.com/auth/youtube',
     'https://www.googleapis.com/auth/youtube.upload',
 ]
-
-ARTIST_SEPARATORS = ',&'

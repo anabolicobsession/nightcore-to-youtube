@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from src import config
+from src.metadata import Metadata
 
 
 class WorkingDirectory:
@@ -52,6 +53,9 @@ class WorkingDirectory:
             raise FileNotFoundError(f'Couldn\'t find nightcore files in directory: `{self.path}/`')
 
         return paths
+
+    def get_metadata(self) -> Metadata:
+        return Metadata.from_string(self.get_cover_path(raise_if_not_exists=True).stem)
 
     def speed_and_reverb_to_path(self, speed, reverb, extension) -> Path:
         return self.path / f'{speed}{config.SPEED_REVERB_NAME_SEPARATOR}{reverb}.{extension}'

@@ -117,6 +117,7 @@ async def async_cli(
             raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
 
     logger.info(f'Detected track: \'{working_directory.get_track_path(raise_if_not_exists=True).stem}\'')
+    logger.info(f'Detected metadata: {working_directory.get_metadata().represent_attributes(attribute_separator=", ", value_separator="=")}')
 
 
     # pipeline steps
