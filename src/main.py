@@ -41,6 +41,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
 <working-directory>: Directory where the track and its cover art are located
 [<speed> [reverb]]...: Speed and reverb parameters of the final tracks
 """)
+# mandatory args
 @click.argument(
     'working_directory',
     type=click.Path(path_type=Path, exists=True, file_okay=False, readable=True, writable=True),
@@ -53,6 +54,7 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     nargs=-1,
     metavar='[<speed> [reverb]]...',
 )
+# steps
 @click.option(
     '--steps',
     '-ss',
@@ -69,12 +71,14 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     help='Select specific pipeline step',
     metavar='',
 )
+# create-nightcore
 @click.option(
     '--gui',
     '-g',
     is_flag=True,
     help='Run the `create-nightcore` step with a graphical interface',
 )
+# nightcore-to-video
 @click.option(
     '--preset',
     '-p',
