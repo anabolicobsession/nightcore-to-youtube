@@ -44,3 +44,14 @@ QUATH_SCOPES = [
     'https://www.googleapis.com/auth/youtube',
     'https://www.googleapis.com/auth/youtube.upload',
 ]
+
+SLOWED_NAMES = [
+    'Deeply Slowed',
+    'Slowed',
+    'Slightly Slowed',
+]
+SPED_UP_NAMES = [
+    'Slightly Sped Up',
+    'Sped Up',
+    'Super Sped Up',
+]

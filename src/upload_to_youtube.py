@@ -38,18 +38,6 @@ def get_credentials():
     return creds
 
 
-SLOWED_NAMES = [
-    'Deeply Slowed',
-    'Slowed',
-    'Slightly Slowed',
-]
-
-SPED_UP_NAMES = [
-    'Slightly Sped Up',
-    'Sped Up',
-    'Super Sped Up',
-]
-
 def generate_speed_names(amount_slowed, amount_sped_up):
     match amount_slowed:
         case 0: slowed = []
@@ -65,7 +53,7 @@ def generate_speed_names(amount_slowed, amount_sped_up):
         case 3: sped_up = [0, 1, 2]
         case _: raise ValueError(f'Unexpected amount of sped up versions: {amount_slowed}')
 
-    return [SLOWED_NAMES[x] for x in slowed] + [SPED_UP_NAMES[x] for x in sped_up]
+    return [config.SLOWED_NAMES[x] for x in slowed] + [config.SPED_UP_NAMES[x] for x in sped_up]
 
 
 def parse_to_hashtags(string: str) -> list[str]:
