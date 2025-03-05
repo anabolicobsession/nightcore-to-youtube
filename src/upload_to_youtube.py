@@ -7,6 +7,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+from src.metadata import Metadata
 from src import config
 from src.working_directory import WorkingDirectory
 
@@ -77,9 +78,10 @@ def upload_video(
         artist: str,
         name: str,
         speed_name: str,
-        is_sped_up: bool = False,
+        is_sped_up: bool,
+        metadata: Metadata,
 ):
-    # setting up metadata
+    # setting up YouTube metadata
     title = f'{artist} - {name} ({speed_name})'
     artists = split_artists(artist)
     tags = [
@@ -94,6 +96,7 @@ def upload_video(
     body = {
         'snippet': {
             'title': title,
+            'description': metadata.represent_attributes(attribute_separator='\n', value_separator=': '),
             'tags': tags,
             'categoryId': '10',  # music category
         },
@@ -127,4 +130,5 @@ def upload_to_youtube(working_directory: WorkingDirectory):
             name=name,
             speed_name=speed_name,
             is_sped_up=speed > config.STANDARD_SPEED,
+            metadata=working_directory.get_metadata(),
         )
