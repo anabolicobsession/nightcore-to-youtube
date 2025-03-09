@@ -118,13 +118,15 @@ async def async_cli(
         ratio: param_types.RatioParamType.TYPE,
         uploaded_video_count: Optional[int],
 ):
-    # parameter validation and conversion
+    # conversion + auxiliary stuff
     working_directory = WorkingDirectory(working_directory.resolve())
     preset = Preset(preset)
 
     def has_step(checked_step: Step):
         return checked_step.value in set(range(steps[0], steps[1] + 1) if not step else [step])
 
+
+    # validation
     if has_step(Step.CREATE_NIGHTCORE):
         if not (speeds_and_reverbs := extract_speed_and_reverb_tuples(speeds_and_reverbs)):
             raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
@@ -145,11 +147,13 @@ async def async_cli(
                     message=f'{uploaded_video_count}. Valid range: [{1}:{available_videos}] or [{-available_videos}:{-1}]',
                 )
 
+
+    # ensuring track and metadata are correct
     logger.info(f'Detected track: \'{working_directory.get_track_path(raise_if_not_exists=True).stem}\'')
     logger.info(f'Detected metadata: {working_directory.get_metadata().represent_attributes(attribute_separator=", ", value_separator="=")}')
 
 
-    # pipeline steps
+    # steps
     start_total_time = time.time()
 
     for current_step, log_message, callback in [
