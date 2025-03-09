@@ -25,12 +25,24 @@ def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) ->
     i = 0
 
     while i < len(speeds_and_reverbs):
+        # speed
         speed = speeds_and_reverbs[i]
-        if not (50 <= speed <= 200): raise click.BadParameter(f'Speed must be between 50 and 200 and reverb between 0 and 50. Given: {speed} ({i + 1}-th number parameter).')
-        speeds.append(speed); i += 1
 
-        if i < len(speeds_and_reverbs) and 0 <= speeds_and_reverbs[i] < 50: reverbs.append(speeds_and_reverbs[i]); i += 1
-        else: reverbs.append(0)
+        if not (50 <= speed <= 200):
+            raise click.BadParameter(
+                f'{speed} ({i + 1}-th). Speed / Reverb valid ranges: [50:200] / [0:50)',
+                param_hint='`speeds-and-reverbs`',
+            )
+
+        speeds.append(speed)
+        i += 1
+
+        # reverb
+        if i < len(speeds_and_reverbs) and 0 <= speeds_and_reverbs[i] < 50:
+            reverbs.append(speeds_and_reverbs[i])
+            i += 1
+        else:
+            reverbs.append(0)
 
     return list(zip(speeds, reverbs))
 
@@ -145,7 +157,11 @@ async def async_cli(
     # validation
     if has_step(Step.CREATE_NIGHTCORE):
         if not (speeds_and_reverbs := extract_speed_and_reverb_tuples(speeds_and_reverbs)):
-            raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
+            raise click.MissingParameter(
+                '`create-nightcore` step requires at least one value',
+                param_type='option',
+                param_hint='`speeds-and-reverbs`',
+            )
 
     if has_step(Step.UPLOAD_TO_YOUTUBE):
         if uploaded_video_count is not None:
