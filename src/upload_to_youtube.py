@@ -67,6 +67,7 @@ def upload_video(
         artist: str,
         name: str,
         speed_name: str,
+        speed_name_max_length: str,
         is_sped_up: bool,
         metadata: Metadata,
 ):
@@ -83,7 +84,7 @@ def upload_video(
     ]
 
     formatted_speed_name = f"'{speed_name}'"
-    logger.info(f'Uploading: {formatted_speed_name:<{len(config.SLOWED_NAMES[-1]) + 2}} - {" ".join(["#" + x for x in tags])}')
+    logger.info(f'Uploading: {formatted_speed_name:<{speed_name_max_length + 2}} {" ".join(["#" + x for x in tags])}')
 
     body = {
         'snippet': {
@@ -124,6 +125,7 @@ def upload_to_youtube(working_directory: WorkingDirectory, uploaded_video_count:
             artist=artist,
             name=name,
             speed_name=speed_name,
+            speed_name_max_length=max([len(x) for _, _, x in videos_and_parameters]),
             is_sped_up=speed > config.STANDARD_SPEED,
             metadata=working_directory.get_metadata(),
         )
