@@ -19,6 +19,12 @@ Ratio = float
 logger = logging.getLogger(__name__)
 
 
+def remove_previous_video(working_directory: WorkingDirectory):
+    if paths := working_directory.get_video_paths():
+        for video in paths: video.unlink()
+        logger.info(f'Removed obsolete files: {", ".join([x.name for x in paths])}')
+
+
 class Preset(Enum):
     VERY_SLOW = 'veryslow'
     SLOWER = 'slower'
@@ -32,37 +38,6 @@ class Preset(Enum):
     @property
     def DEFAULT(cls) -> Self:
         return cls.ULTRA_FAST
-
-
-def nightcore_to_video(
-        working_directory: WorkingDirectory,
-        preset: Preset = Preset.DEFAULT,
-        ratio: Ratio = config.MIN_VIDEO_RATIO,
-):
-    remove_previous_video(working_directory)
-
-    nightcores = working_directory.get_nightcore_paths(raise_if_not_exist=True)
-    cover = working_directory.get_cover_path()
-    videos = [x.with_suffix('.mp4') for x in nightcores]
-
-    N = len(nightcores)
-    args = zip(
-        nightcores,
-        [cover] * len(nightcores),
-        videos,
-        [preset] * N,
-        [ratio] * N,
-    )
-    processes = min(multiprocessing.cpu_count(), len(nightcores))
-
-    with multiprocessing.Pool(processes=processes) as pool:
-        pool.starmap(_nightcore_to_video, args)
-
-
-def remove_previous_video(working_directory: WorkingDirectory):
-    if paths := working_directory.get_video_paths():
-        for video in paths: video.unlink()
-        logger.info(f'Removed obsolete files: {", ".join([x.name for x in paths])}')
 
 
 def _nightcore_to_video(
@@ -110,3 +85,28 @@ def _nightcore_to_video(
 
         except Exception as _:
             traceback.print_exc()
+
+
+def nightcore_to_video(
+        working_directory: WorkingDirectory,
+        preset: Preset = Preset.DEFAULT,
+        ratio: Ratio = config.MIN_VIDEO_RATIO,
+):
+    remove_previous_video(working_directory)
+
+    nightcores = working_directory.get_nightcore_paths(raise_if_not_exist=True)
+    cover = working_directory.get_cover_path()
+    videos = [x.with_suffix('.mp4') for x in nightcores]
+
+    N = len(nightcores)
+    args = zip(
+        nightcores,
+        [cover] * len(nightcores),
+        videos,
+        [preset] * N,
+        [ratio] * N,
+    )
+    processes = min(multiprocessing.cpu_count(), len(nightcores))
+
+    with multiprocessing.Pool(processes=processes) as pool:
+        pool.starmap(_nightcore_to_video, args)

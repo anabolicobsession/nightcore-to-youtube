@@ -5,6 +5,17 @@ from src import config
 from src.metadata import Metadata
 
 
+Extension = str
+
+
+def has_any_of_extensions(path: Path, extensions: Iterable[Extension]):
+    return any(path.suffix.casefold() == '.' + x for x in extensions)
+
+
+class TooManyFilesError(Exception):
+    ...
+
+
 class WorkingDirectory:
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -98,13 +109,3 @@ class WorkingDirectory:
     @staticmethod
     def _has_nightcore_stem(path: Path):
         return bool(config.NIGHTCORE_NAME_PATTERN.fullmatch(path.stem))
-
-
-class TooManyFilesError(Exception):
-    ...
-
-
-Extension = str
-
-def has_any_of_extensions(path: Path, extensions: Iterable[Extension]):
-    return any(path.suffix.casefold() == '.' + x for x in extensions)

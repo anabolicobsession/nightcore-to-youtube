@@ -19,6 +19,22 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 
 
+def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> SpeedsAndReverbs:
+    speeds = []
+    reverbs = []
+    i = 0
+
+    while i < len(speeds_and_reverbs):
+        speed = speeds_and_reverbs[i]
+        if not (50 <= speed <= 200): raise click.BadParameter(f'Speed must be between 50 and 200 and reverb between 0 and 50. Given: {speed} ({i + 1}-th number parameter).')
+        speeds.append(speed); i += 1
+
+        if i < len(speeds_and_reverbs) and 0 <= speeds_and_reverbs[i] < 50: reverbs.append(speeds_and_reverbs[i]); i += 1
+        else: reverbs.append(0)
+
+    return list(zip(speeds, reverbs))
+
+
 class Step(Enum):
     CREATE_NIGHTCORE = auto()
     NIGHTCORE_TO_VIDEO = auto()
@@ -185,22 +201,6 @@ async def async_cli(
 
     logger.info('')
     logger.info(f'Pipeline execution time: {int(time.time() - start_total_time):.0f}s')
-
-
-def extract_speed_and_reverb_tuples(speeds_and_reverbs: list[Speed | Reverb]) -> SpeedsAndReverbs:
-    speeds = []
-    reverbs = []
-    i = 0
-
-    while i < len(speeds_and_reverbs):
-        speed = speeds_and_reverbs[i]
-        if not (50 <= speed <= 200): raise click.BadParameter(f'Speed must be between 50 and 200 and reverb between 0 and 50. Given: {speed} ({i + 1}-th number parameter).')
-        speeds.append(speed); i += 1
-
-        if i < len(speeds_and_reverbs) and 0 <= speeds_and_reverbs[i] < 50: reverbs.append(speeds_and_reverbs[i]); i += 1
-        else: reverbs.append(0)
-
-    return list(zip(speeds, reverbs))
 
 
 if __name__ == '__main__':
