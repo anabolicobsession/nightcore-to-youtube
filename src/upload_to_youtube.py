@@ -2,6 +2,7 @@ import logging
 import pickle
 import re
 from pathlib import Path
+from typing import Optional
 
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -98,7 +99,7 @@ def upload_video(
     }
 
 
-def upload_to_youtube(working_directory: WorkingDirectory):
+def upload_to_youtube(working_directory: WorkingDirectory, uploaded_video_count: Optional[int]):
     # sort videos by speed
     videos = working_directory.get_video_paths(raise_if_not_exist=True)
     speeds = [working_directory.path_to_speed_and_reverb(x)[0] for x in videos]
@@ -107,12 +108,15 @@ def upload_to_youtube(working_directory: WorkingDirectory):
     sorted_speed_names = generate_speed_names(amount_slowed=amount_slowed, amount_sped_up=len(speeds) - amount_slowed)
     sorted_videos_and_speeds = sorted(zip(videos, speeds), key=lambda x: x[1])
 
+    videos_and_parameters = list(zip(*zip(*sorted_videos_and_speeds), sorted_speed_names))
+    if uploaded_video_count: videos_and_parameters = videos_and_parameters[:uploaded_video_count] if uploaded_video_count > 0 else videos_and_parameters[uploaded_video_count:]
+
 
     # upload videos
     service = build('youtube', 'v3', credentials=get_credentials())
     track_name = working_directory.get_track_path(raise_if_not_exists=True).stem
 
-    for video, speed, speed_name in zip(*zip(*sorted_videos_and_speeds), sorted_speed_names):
+    for video, speed, speed_name in videos_and_parameters:
         artist, name = tuple(track_name.split(' - ', 1))
         upload_video(
             service,

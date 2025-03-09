@@ -4,7 +4,7 @@ import logging
 import time
 from enum import Enum, auto
 from pathlib import Path
-from typing import Self
+from typing import Optional, Self
 
 import click
 
@@ -96,6 +96,14 @@ Create slowed and nightcore versions of a track and upload them to YouTube.
     help='Select a nightcore video ratio in the form of `width:height`',
     metavar='',
 )
+# upload-to-youtube
+@click.option(
+    '--uploaded-video-count',
+    '-u',
+    type=int,
+    help='Select a subset of videos to upload. Positive / Negative integer N specifies index range [1:N] / [N:-1]',
+    metavar='',
+)
 def cli(**kwargs):
     asyncio.run(async_cli(**kwargs))
 
@@ -108,6 +116,7 @@ async def async_cli(
         gui: bool,
         preset: str,
         ratio: param_types.RatioParamType.TYPE,
+        uploaded_video_count: Optional[int],
 ):
     # parameter validation and conversion
     working_directory = WorkingDirectory(working_directory.resolve())
@@ -119,6 +128,22 @@ async def async_cli(
     if has_step(Step.CREATE_NIGHTCORE):
         if not (speeds_and_reverbs := extract_speed_and_reverb_tuples(speeds_and_reverbs)):
             raise click.MissingParameter('At least one speed parameter of the final track is required if \'create-nightcore\' step is involved')
+
+    if has_step(Step.UPLOAD_TO_YOUTUBE):
+        if uploaded_video_count is not None:
+
+            if has_step(Step.CREATE_NIGHTCORE):
+                available_videos = len(speeds_and_reverbs)
+            elif has_step(Step.NIGHTCORE_TO_VIDEO):
+                available_videos = len(working_directory.get_nightcore_paths(raise_if_not_exist=True))
+            else:
+                available_videos = len(working_directory.get_video_paths(raise_if_not_exist=True))
+
+            if not (1 <= abs(uploaded_video_count) <= available_videos):
+                raise click.BadParameter(
+                    param_hint='`uploaded-video-count` option',
+                    message=f'{uploaded_video_count}. Valid range: [{1}:{available_videos}] or [{-available_videos}:{-1}]',
+                )
 
     logger.info(f'Detected track: \'{working_directory.get_track_path(raise_if_not_exists=True).stem}\'')
     logger.info(f'Detected metadata: {working_directory.get_metadata().represent_attributes(attribute_separator=", ", value_separator="=")}')
@@ -141,7 +166,7 @@ async def async_cli(
         (
                 Step.UPLOAD_TO_YOUTUBE,
                 'Uploading videos to YouTube',
-                lambda: upload_to_youtube(working_directory),
+                lambda: upload_to_youtube(working_directory, uploaded_video_count=uploaded_video_count),
         ),
     ]:
         if has_step(current_step):
