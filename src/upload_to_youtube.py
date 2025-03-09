@@ -82,8 +82,8 @@ def upload_video(
         )
     ]
 
-    logger.info(f'Uploading: \'{title}\'')
-    logger.info(f'Tags: {" ".join(["#" + x for x in tags])}')
+    formatted_speed_name = f"'{speed_name}'"
+    logger.info(f'Uploading: {formatted_speed_name:<{len(config.SLOWED_NAMES[-1]) + 2}} - {" ".join(["#" + x for x in tags])}')
 
     body = {
         'snippet': {
