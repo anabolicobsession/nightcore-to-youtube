@@ -1,8 +1,10 @@
 import logging
+import sys
 from dataclasses import dataclass
 from typing import Self
 
 from src import config
+from src.config import ExitCode
 
 
 logger = logging.getLogger(__name__)
@@ -37,8 +39,8 @@ class Metadata:
             args = year, season, playlist
             return cls(*args)
         except:
-            logger.error(f'Metadata string can\'t be parsed: {string}')
-            raise
+            logger.error(f'Metadata string can\'t be parsed from string: \'{string}\'', exc_info=True)
+            sys.exit(ExitCode.INCORRECT_USAGE)
 
     def represent_attributes(self, attribute_separator=', ', value_separator='='):
         return attribute_separator.join(
