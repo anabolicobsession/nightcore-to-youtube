@@ -10,7 +10,7 @@ import ffmpeg
 from PIL import Image
 
 from src import config
-from src.working_directory import WorkingDirectory
+from src.utils.working_directory import WorkingDirectory
 
 
 Ratio = float

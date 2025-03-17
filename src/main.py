@@ -8,11 +8,12 @@ from typing import Optional, Self
 
 import click
 
-from src import config, param_types
-from src.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
-from src.nightcore_to_video import Preset, nightcore_to_video
-from src.upload_to_youtube import upload_to_youtube
-from src.working_directory import WorkingDirectory
+from src import config
+from src.steps.create_nightcore import Reverb, Speed, SpeedsAndReverbs, create_nightcore
+from src.steps.nightcore_to_video import Preset, nightcore_to_video
+from src.steps.upload_to_youtube import upload_to_youtube
+from src.utils import param_types
+from src.utils.working_directory import WorkingDirectory
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')

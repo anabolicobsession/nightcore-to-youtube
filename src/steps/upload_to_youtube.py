@@ -9,8 +9,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 from src import config
-from src.metadata import Metadata
-from src.working_directory import WorkingDirectory
+from src.utils.metadata import Metadata
+from src.utils.working_directory import WorkingDirectory
 
 
 logger = logging.getLogger(__name__)

@@ -6,7 +6,7 @@ from pathlib import Path
 from playwright.async_api import BrowserContext, Page, async_playwright
 
 from src import config
-from src.working_directory import WorkingDirectory
+from src.utils.working_directory import WorkingDirectory
 
 
 Speed = int

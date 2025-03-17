@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from src import config
-from src.metadata import Metadata
+from src.utils.metadata import Metadata
 
 
 Extension = str
