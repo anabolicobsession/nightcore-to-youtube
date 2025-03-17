@@ -34,7 +34,7 @@ class Metadata:
     @classmethod
     def from_string(cls, string: str) -> Self:
         try:
-            year, season, playlist = tuple(string.split('_'))
+            year, season, playlist = tuple(('20' + string).split('_'))
             year, season = int(year), int(season)
             args = year, season, playlist
             return cls(*args)
