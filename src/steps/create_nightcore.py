@@ -64,10 +64,10 @@ class Downloader:
         self.download = None
 
     @asynccontextmanager
-    async def download_as(self, file_name, wait_for_download_to_start=15000):
+    async def download_as(self, file_name):
         self.file_name = file_name
         yield
-        await self.page.wait_for_event('download', timeout=wait_for_download_to_start)
+        await self.page.wait_for_event('download')
         await self.download.path()  # wait for download to complete
         self.file_name = None
 
