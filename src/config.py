@@ -50,8 +50,3 @@ SPED_UP_NAMES = [
     'Sped Up',
     'Super Sped Up',
 ]
-
-
-# general
-class ExitCode:
-    INCORRECT_USAGE = 2

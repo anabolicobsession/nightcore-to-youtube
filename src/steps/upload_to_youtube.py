@@ -14,7 +14,7 @@ from googleapiclient.http import MediaFileUpload
 
 from src import config
 from src.utils.metadata import Metadata
-from src.config import ExitCode
+from src.utils.utils import ExitCode
 from src.utils.working_directory import WorkingDirectory
 
 

@@ -10,7 +10,7 @@ import ffmpeg
 from PIL import Image
 
 from src import config
-from src.config import ExitCode
+from src.utils.utils import ExitCode
 from src.utils.working_directory import WorkingDirectory
 
 
