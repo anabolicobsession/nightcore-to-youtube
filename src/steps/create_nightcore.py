@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def remove_previous_nightcore(working_directory: WorkingDirectory):
     if paths := working_directory.get_nightcore_paths():
         for x in paths: x.unlink()
-        logger.info(f'Removed obsolete files: {", ".join([x.name for x in paths])}')
+        logger.info(f'Cleared files: {", ".join([x.name for x in paths])}')
 
 
 async def move_slider(page: Page, selector, steps):
@@ -81,6 +81,7 @@ async def _create_nightcore(
         working_directory: WorkingDirectory,
         speed: Speed,
         reverb: Reverb,
+        verbose=False,
 ):
     page = await context.new_page()
     downloader = Downloader(page, directory=working_directory.get_path(raise_if_not_exists=True))
@@ -90,16 +91,15 @@ async def _create_nightcore(
 
     await page.goto('https://nightcore.studio/')
 
-    logger.info(wrap_log('Uploading source track'))
+    if verbose: logger.info('Uploading track')
     await page.set_input_files('input[type="file"]', working_directory.get_track_path(raise_if_not_exists=True))
     await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
 
-    logger.info(wrap_log('Setting up nightcore parameters'))
+    if verbose: logger.info('Setting up parameters')
     await set_nightcore_parameters(page, speed=speed, reverb=reverb)
 
-    logger.info(wrap_log('Downloading nightcore'))
+    if verbose: logger.info('Downloading')
     async with downloader.download_as(working_directory.speed_and_reverb_to_path(speed, reverb, 'mp3').name): await (await page.wait_for_selector(Selector.DOWNLOAD, timeout=1000)).click()
-    logger.info(wrap_log(f'Nightcore saved'))
 
     await page.close()
 
@@ -119,5 +119,13 @@ async def create_nightcore(
             channel='msedge',
             headless=not gui,
         )
-        await asyncio.gather(*[_create_nightcore(context, working_directory, *x) for x in speeds_and_reverbs])
+        await asyncio.gather(
+            *[
+                _create_nightcore(context, working_directory, *x, verbose=y)
+                for x, y in zip(
+                    speeds_and_reverbs,
+                    [True] + [False] * (len(speeds_and_reverbs) - 1),
+                )
+            ]
+        )
         await context.close()

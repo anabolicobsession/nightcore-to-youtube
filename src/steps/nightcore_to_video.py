@@ -1,7 +1,6 @@
 import logging
 import multiprocessing
 import sys
-import time
 import traceback
 from enum import Enum
 from pathlib import Path
@@ -24,7 +23,7 @@ logger = logging.getLogger(__name__)
 def remove_previous_video(working_directory: WorkingDirectory):
     if paths := working_directory.get_video_paths():
         for video in paths: video.unlink()
-        logger.info(f'Removed obsolete files: {", ".join([x.name for x in paths])}')
+        logger.info(f'Cleared files: {", ".join([x.name for x in paths])}')
 
 
 class Preset(Enum):
@@ -61,8 +60,6 @@ def _nightcore_to_video(
             return f'{speed:>3}x{reverb:<2}: {log}'
 
         try:
-            logger.info(wrap_log('Starting convertion')); start_time = time.time()
-
             (
                 ffmpeg
                 .output(
@@ -108,6 +105,7 @@ def nightcore_to_video(
     videos = [x.with_suffix('.mp4') for x in nightcores]
 
     # conversion
+    logger.info('Creating videos concurrently')
     N = len(nightcores)
     args = zip(
         nightcores,

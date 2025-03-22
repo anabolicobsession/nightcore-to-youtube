@@ -182,8 +182,7 @@ async def async_cli(
 
 
     # ensuring track and metadata are correct
-    logger.info(f'Detected track: \'{working_directory.get_track_path(raise_if_not_exists=True).stem}\'')
-    logger.info(f'Detected metadata: {working_directory.get_metadata().represent()}')
+    logger.info(f"Track: '{working_directory.get_track_path(raise_if_not_exists=True).stem}' {working_directory.get_metadata().represent()}")
 
 
     # steps
@@ -202,7 +201,7 @@ async def async_cli(
         ),
         (
                 Step.UPLOAD_TO_YOUTUBE,
-                'Uploading videos to YouTube',
+                'Uploading to YouTube',
                 lambda: upload_to_youtube(working_directory, uploaded_video_count=uploaded_video_count),
         ),
     ]:
@@ -214,10 +213,10 @@ async def async_cli(
             result = callback()
             if inspect.isawaitable(result): await result
 
-            logger.info(f'Step execution time: {int(time.time() - start_time):.0f}s')
+            logger.info(f'Time: {int(time.time() - start_time):.0f}s')
 
     logger.info('')
-    logger.info(f'Pipeline execution time: {int(time.time() - start_total_time):.0f}s')
+    logger.info(f'Total: {int(time.time() - start_total_time):.0f}s')
 
 
 if __name__ == '__main__':
