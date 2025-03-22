@@ -1,15 +1,20 @@
 import logging
 import pickle
 import re
+import sys
+import time
 from pathlib import Path
 from typing import Optional
 
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient import errors
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 from src import config
 from src.utils.metadata import Metadata
+from src.config import ExitCode
 from src.utils.working_directory import WorkingDirectory
 
 
@@ -61,6 +66,21 @@ def parse_to_hashtags(string: str) -> list[str]:
     return re.sub(r'[^a-zA-Z0-9\s]', '', string).split()
 
 
+def wait_for_uploading_to_finish(service, id, check_interval=1):
+    while True:
+        response = service.videos().list(part='processingDetails', id=id).execute()
+        status = response['items'][0]['processingDetails']['processingStatus']
+
+        match status:
+            case 'succeeded':
+                return
+            case 'failed':
+                logger.error(f'Processing failed')
+                sys.exit(ExitCode.GENERAL_ERROR)
+
+        time.sleep(check_interval)
+
+
 def upload_video(
         service,
         path: Path,
@@ -70,7 +90,8 @@ def upload_video(
         speed_name_max_length: str,
         is_sped_up: bool,
         metadata: Metadata,
-):
+) -> bool:
+
     # setting up YouTube metadata
     title = f'{artist} - {name} ({speed_name})'
     tags = [
@@ -89,7 +110,7 @@ def upload_video(
     body = {
         'snippet': {
             'title': title,
-            'description': metadata.represent_attributes(attribute_separator='\n', value_separator=': '),
+            'description': metadata.represent(),
             'tags': tags,
             'categoryId': '10',  # music category
         },
@@ -98,6 +119,21 @@ def upload_video(
             'madeForKids': False
         }
     }
+
+    # uploading video
+    media = MediaFileUpload(path, mimetype='video/*', resumable=True)
+    request = service.videos().insert(part=','.join(body), body=body, media_body=media)
+    response = None
+
+    while response is None:
+        try:
+            status, response = request.next_chunk()
+        except errors.ResumableUploadError:
+            logger.warning(f'Daily upload limit exceeded. Cancelling uploads')
+            return False
+
+    wait_for_uploading_to_finish(service, response['id'])
+    return True
 
 
 def upload_to_youtube(working_directory: WorkingDirectory, uploaded_video_count: Optional[int]):
@@ -112,14 +148,13 @@ def upload_to_youtube(working_directory: WorkingDirectory, uploaded_video_count:
     videos_and_parameters = list(zip(*zip(*sorted_videos_and_speeds), sorted_speed_names))
     if uploaded_video_count: videos_and_parameters = videos_and_parameters[:uploaded_video_count] if uploaded_video_count > 0 else videos_and_parameters[uploaded_video_count:]
 
-
     # upload videos
     service = build('youtube', 'v3', credentials=get_credentials())
     track_name = working_directory.get_track_path(raise_if_not_exists=True).stem
 
     for video, speed, speed_name in videos_and_parameters:
         artist, name = tuple(track_name.split(' - ', 1))
-        upload_video(
+        if not upload_video(
             service,
             path=video,
             artist=artist,
@@ -128,4 +163,5 @@ def upload_to_youtube(working_directory: WorkingDirectory, uploaded_video_count:
             speed_name_max_length=max([len(x) for _, _, x in videos_and_parameters]),
             is_sped_up=speed > config.STANDARD_SPEED,
             metadata=working_directory.get_metadata(),
-        )
+        ):
+            return
