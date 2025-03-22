@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import sys
 import time
 import traceback
 from enum import Enum
@@ -10,6 +11,7 @@ import ffmpeg
 from PIL import Image
 
 from src import config
+from src.config import ExitCode
 from src.utils.working_directory import WorkingDirectory
 
 
@@ -46,7 +48,8 @@ def _nightcore_to_video(
         video: Path,
         preset: Preset,
         ratio: Ratio,
-):
+) -> bool:
+
     with Image.open(cover) as x:
         width, height = x.size
         speed, reverb = WorkingDirectory.path_to_speed_and_reverb(nightcore)
@@ -81,10 +84,15 @@ def _nightcore_to_video(
                 .run(overwrite_output=True)
             )
 
-            logger.info(wrap_log(f'Convertion completed in {(time.time() - start_time):.0f}s'))
+        except ffmpeg.Error as e:
+            logger.info(wrap_log(f'Most likely caught keyboard interruption: {e}'))
+            return False
 
-        except Exception as _:
+        except Exception:
             traceback.print_exc()
+            return False
+
+    return True
 
 
 def nightcore_to_video(
@@ -92,12 +100,14 @@ def nightcore_to_video(
         preset: Preset = Preset.DEFAULT,
         ratio: Ratio = config.MIN_VIDEO_RATIO,
 ):
+    # preparation
     remove_previous_video(working_directory)
 
     nightcores = working_directory.get_nightcore_paths(raise_if_not_exist=True)
     cover = working_directory.get_cover_path()
     videos = [x.with_suffix('.mp4') for x in nightcores]
 
+    # conversion
     N = len(nightcores)
     args = zip(
         nightcores,
@@ -109,4 +119,5 @@ def nightcore_to_video(
     processes = min(multiprocessing.cpu_count(), len(nightcores))
 
     with multiprocessing.Pool(processes=processes) as pool:
-        pool.starmap(_nightcore_to_video, args)
+        if not(all(pool.starmap(_nightcore_to_video, args))):
+            sys.exit(ExitCode.GENERAL_ERROR)
