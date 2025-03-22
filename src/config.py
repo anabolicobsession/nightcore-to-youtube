@@ -11,14 +11,9 @@ VIDEO_EXTENSIONS = ['mp4']
 SPEED_REVERB_NAME_SEPARATOR = '_'
 NIGHTCORE_NAME_PATTERN = re.compile(rf'\d+(?:{SPEED_REVERB_NAME_SEPARATOR}\d+)?')
 
-METADATA_DISCOVERY_YEARS = list(range(2023, 2100))
+METADATA_DISCOVERY_YEARS = list(range(23, 100))
 METADATA_DISCOVERY_SEASONS = [1, 2, 3, 4]
-METADATA_PLAYLISTS_MAPPING = {
-    'w': 'west',
-    'p': 'phonk',
-    'e': 'electronic',
-    's': 'east',
-}
+METADATA_PLAYLISTS = {'w', 'p', 'e', 's'}
 
 
 # create-nightcore

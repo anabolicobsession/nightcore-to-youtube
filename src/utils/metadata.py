@@ -25,16 +25,14 @@ class Metadata:
             allowed_values = ", ".join(map(str, config.METADATA_DISCOVERY_SEASONS))
             raise ValueError(f'Invalid discovery season: {self.discovery_season}. Allowed values: {allowed_values}')
 
-        if self.playlist not in config.METADATA_PLAYLISTS_MAPPING:
-            allowed_values = ", ".join(["'" + x + "'" for x in config.METADATA_PLAYLISTS_MAPPING.values()])
-            raise ValueError(f'Invalid playlist: {self.playlist}. Allowed values: {allowed_values}')
-
-        self.playlist = config.METADATA_PLAYLISTS_MAPPING[self.playlist]
+        if self.playlist not in config.METADATA_PLAYLISTS:
+            allowed_values = ", ".join(["'" + x + "'" for x in config.METADATA_PLAYLISTS])
+            raise ValueError(f"Invalid playlist: '{self.playlist}'. Allowed values: {allowed_values}")
 
     @classmethod
     def from_string(cls, string: str) -> Self:
         try:
-            year, season, playlist = tuple(string.split('_'))
+            year, season, playlist = tuple((string).split('_'))
             year, season = int(year), int(season)
             args = year, season, playlist
             return cls(*args)
