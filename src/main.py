@@ -183,7 +183,7 @@ async def async_cli(
 
     # ensuring track and metadata are correct
     logger.info(f'Detected track: \'{working_directory.get_track_path(raise_if_not_exists=True).stem}\'')
-    logger.info(f'Detected metadata: {working_directory.get_metadata().represent_attributes(attribute_separator=", ", value_separator="=")}')
+    logger.info(f'Detected metadata: {working_directory.get_metadata().represent()}')
 
 
     # steps

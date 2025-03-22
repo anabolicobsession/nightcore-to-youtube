@@ -40,11 +40,24 @@ class Metadata:
             logger.error(f'Metadata string can\'t be parsed from string: \'{string}\'', exc_info=True)
             sys.exit(ExitCode.INCORRECT_USAGE)
 
-    def represent_attributes(self, attribute_separator=', ', value_separator='='):
-        return attribute_separator.join(
-            f'{self._format_attribute_name(k)}{value_separator}{v if not isinstance(v, str) else v.title()}'
-            for k, v in vars(self).items()
-        )
+    def represent(
+            self,
+            include_attribute_names=False,
+            attribute_separator=', ',
+            value_separator='.',
+            title_string_values=False,
+    ):
+        if not include_attribute_names:
+            return value_separator.join(
+                f'{v.title() if title_string_values and isinstance(v, str) else v}'
+                for _, v in vars(self).items()
+            )
+        else:
+            return attribute_separator.join(
+                f'{self._format_attribute_name(k)}{value_separator}'
+                f'{v.title() if title_string_values and isinstance(v, str) else v}'
+                for k, v in vars(self).items()
+            )
 
     @staticmethod
     def _format_attribute_name(name: str):
