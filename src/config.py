@@ -5,7 +5,7 @@ from pathlib import Path
 
 # working-directory
 AUDIO_EXTENSIONS = ['mp3', 'opus']
-COVER_EXTENSIONS = ['png', 'jpg']
+COVER_EXTENSIONS = ['png', 'jpg', 'jpeg']
 VIDEO_EXTENSIONS = ['mp4']
 
 SPEED_REVERB_NAME_SEPARATOR = '_'
