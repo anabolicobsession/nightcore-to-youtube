@@ -21,6 +21,19 @@ from src.utils.working_directory import WorkingDirectory
 logger = logging.getLogger(__name__)
 
 
+SLOWED_NAMES = [
+    'Super Deeply Slowed',
+    'Deeply Slowed',
+    'Slowed',
+    'Slightly Slowed',
+]
+SPED_UP_NAMES = [
+    'Slightly Sped Up',
+    'Sped Up',
+    'Super Sped Up',
+]
+
+
 def get_credentials():
     creds = None
 
@@ -47,9 +60,10 @@ def get_credentials():
 def generate_speed_names(amount_slowed, amount_sped_up):
     match amount_slowed:
         case 0: slowed = []
-        case 1: slowed = [1]
-        case 2: slowed = [0, 1]
-        case 3: slowed = [0, 1, 2]
+        case 1: slowed = [-2]
+        case 2: slowed = [-3, -2]
+        case 3: slowed = [-3, -2, -1]
+        case 4: slowed = [-4, -3, -2, -1]
         case _: raise ValueError(f'Unexpected amount of slowed versions: {amount_slowed}')
 
     match amount_sped_up:
