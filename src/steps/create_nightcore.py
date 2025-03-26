@@ -93,7 +93,7 @@ async def _create_nightcore(
 
     if verbose: logger.info('Uploading track')
     await page.set_input_files('input[type="file"]', working_directory.get_track_path(raise_if_not_exists=True))
-    await (await page.wait_for_selector(Selector.PAUSE, timeout=2000)).click()
+    await (await page.wait_for_selector(Selector.PAUSE, timeout=5000)).click()
 
     if verbose: logger.info('Setting up parameters')
     await set_nightcore_parameters(page, speed=speed, reverb=reverb)
